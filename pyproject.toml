@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "personal-inventory"
+version = "0.1.0"
+description = "Web app to use a personal inventory to manage the skills needed for a job position or to keep track of the desired skills"
+authors = [
+    "Ulises Alexander Arguelles Monjaraz <30351520+UlisesAlexanderAM@users.noreply.github.com>",
+]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.100.1"
+SQLAlchemy = "^2.0.19"
+pydantic-settings = "^2.0.2"
+pydantic = "^2.1.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+ruff = "^0.0.282"
+mypy = "^1.4.1"
+pytest = "^7.4.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
