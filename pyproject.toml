@@ -3,7 +3,7 @@ name = "personal-inventory"
 version = "0.1.0"
 description = "Web app to use a personal inventory to manage the skills needed for a job position or to keep track of the desired skills"
 authors = [
-    "Ulises Alexander Arguelles Monjaraz <30351520+UlisesAlexanderAM@users.noreply.github.com>",
+    "Ulises Alexander Arguelles Monjaraz <ulises_alexander_am@proton.me>",
 ]
 license = "MIT"
 readme = "README.md"
