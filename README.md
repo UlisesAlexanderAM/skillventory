@@ -65,8 +65,8 @@ So I decided to create a web app to solve those problems and change a little the
   - [ ] I can register a new place with greater interest
   - [ ] The place with greater interest has a name
   - [ ] The place with greater interest has a link to their website
-  - [ ] The place with greater interest has a link to their job positions page
-  - [ ] The place with greater interest has a link to their LinkedIn page
+  - [ ] The place with greater interest has a link to their job positions page (Optional)
+  - [ ] The place with greater interest has a link to their LinkedIn page (Optional)
 
 - [ ] 6 - Retrieve a place with greater interest
   
