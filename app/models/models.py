@@ -9,10 +9,12 @@ from app.models import schemas
 skill_place_table = sqlalchemy.Table(
     "skill_place_table",
     config.Base.metadata,
-    sqlalchemy.Column("skill_id", sqlalchemy.ForeignKey("skill.id"), primary_key=True),
+    sqlalchemy.Column(
+        "skill_id", sqlalchemy.ForeignKey("skill.skill_id"), primary_key=True
+    ),
     sqlalchemy.Column(
         "place_id",
-        sqlalchemy.ForeignKey("places_with_greater_interest.id"),
+        sqlalchemy.ForeignKey("place_with_greater_interest.place_id"),
         primary_key=True,
     ),
 )
@@ -31,7 +33,7 @@ class Skill(config.Base):
         nullable=False, index=True
     )
     places: orm.Mapped[list["PlaceWithGreaterInterest"]] = orm.relationship(
-        secondary=skill_place_table, back_populates="places"
+        secondary=skill_place_table, back_populates="skills"
     )
 
 
@@ -48,5 +50,5 @@ class PlaceWithGreaterInterest(config.Base):
     job_postings_link: orm.Mapped[str]
     linkedin_link: orm.Mapped[str]
     skills: orm.Mapped[list["Skill"]] = orm.relationship(
-        secondary=skill_place_table, back_populates="skills"
+        secondary=skill_place_table, back_populates="places"
     )
