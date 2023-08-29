@@ -1,5 +1,4 @@
 import pytest
-import sqlalchemy
 from sqlalchemy import orm
 import sqlite3
 from typing import Any
@@ -96,3 +95,30 @@ class TestGetSkills:
         assert skills[0].level_of_confidence == SKILL_1.level_of_confidence
         assert skills[1].skill_name == SKILL_2.skill_name
         assert skills[1].level_of_confidence == SKILL_2.level_of_confidence
+
+
+class TestDeleteSkill:
+    @staticmethod
+    def test_delete_skill(get_db_session: orm.Session, setup_db: Any) -> None:
+        crud.create_skill(session=get_db_session, skill=SKILL_1)
+        skill: models.Skill | None = crud.get_skill_by_name(
+            session=get_db_session, skill_name=SKILL_1.skill_name
+        )
+        crud.delete_skill(session=get_db_session, skill=skill)
+        skill = crud.get_skill_by_name(
+            session=get_db_session, skill_name=SKILL_1.skill_name
+        )
+        assert skill is None
+
+    @staticmethod
+    def test_delete_skill_non_existent(
+        get_db_session: orm.Session, setup_db: Any
+    ) -> None:
+        skill: models.Skill | None = crud.get_skill_by_name(
+            session=get_db_session, skill_name=SKILL_1.skill_name
+        )
+        crud.delete_skill(session=get_db_session, skill=skill)
+        skill = crud.get_skill_by_name(
+            session=get_db_session, skill_name=SKILL_1.skill_name
+        )
+        assert skill is None
