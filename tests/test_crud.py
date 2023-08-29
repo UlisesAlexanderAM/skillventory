@@ -41,10 +41,11 @@ class TestCreateSkill:
         crud.create_skill(get_db_session, SKILL_1)
         stmt: sqlalchemy.Select[tuple[models.Skill]] = sqlalchemy.select(
             models.Skill
-        ).where(models.Skill.skill_name == "python")
-        skill_db = get_db_session.scalars(stmt).one_or_none()
-        assert skill_db.skill_name == "python"
-        assert skill_db.level_of_confidence == schemas.LevelOfConfidence.LEVEL_2
+        ).where(models.Skill.skill_name == SKILL_1.skill_name)
+        skill = get_db_session.scalars(stmt).all()
+        assert len(skill) == 1
+        assert skill[0].skill_name == SKILL_1.skill_name
+        assert skill[0].level_of_confidence == SKILL_1.level_of_confidence
 
     @staticmethod
     def test_create_skill_already_exist(get_db_session: orm.Session, setup_db: Any):
@@ -66,8 +67,8 @@ class TestGetSkills:
         crud.create_skill(session=get_db_session, skill=SKILL_1)
         skills = crud.get_skills(get_db_session)
         assert len(skills) == 1
-        assert skills[0].skill_name == "python"
-        assert skills[0].level_of_confidence == schemas.LevelOfConfidence.LEVEL_2
+        assert skills[0].skill_name == SKILL_1.skill_name
+        assert skills[0].level_of_confidence == SKILL_1.level_of_confidence
 
     @staticmethod
     def test_get_multiple_skills(get_db_session: orm.Session, setup_db: Any) -> None:
@@ -75,7 +76,7 @@ class TestGetSkills:
         crud.create_skill(get_db_session, SKILL_2)
         skills = crud.get_skills(get_db_session)
         assert len(skills) == 2
-        assert skills[0].skill_name == "python"
-        assert skills[0].level_of_confidence == schemas.LevelOfConfidence.LEVEL_2
-        assert skills[1].skill_name == "typescript"
-        assert skills[1].level_of_confidence == schemas.LevelOfConfidence.LEVEL_1
+        assert skills[0].skill_name == SKILL_1.skill_name
+        assert skills[0].level_of_confidence == SKILL_1.level_of_confidence
+        assert skills[1].skill_name == SKILL_2.skill_name
+        assert skills[1].level_of_confidence == SKILL_2.level_of_confidence
