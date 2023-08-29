@@ -35,6 +35,24 @@ SKILL_2 = schemas.SkillBase(
 )
 
 
+class TestGetSkillByName:
+    @staticmethod
+    def test_get_skill_by_name(get_db_session: orm.Session, setup_db: Any) -> None:
+        crud.create_skill(get_db_session, SKILL_1)
+        skill: models.Skill | None = crud.get_skill_by_name(
+            session=get_db_session, skill_name=SKILL_1.skill_name
+        )
+        assert skill.skill_name == SKILL_1.skill_name
+        assert skill.level_of_confidence == SKILL_1.level_of_confidence
+
+    @staticmethod
+    def test_get_skill_by_name_none(get_db_session: orm.Session, setup_db: Any) -> None:
+        skill: models.Skill | None = crud.get_skill_by_name(
+            session=get_db_session, skill_name=SKILL_1.skill_name
+        )
+        assert skill is None
+
+
 class TestCreateSkill:
     @staticmethod
     def test_create_skill(get_db_session: orm.Session, setup_db: Any) -> None:
