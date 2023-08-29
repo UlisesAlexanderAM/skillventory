@@ -35,7 +35,8 @@ SKILL_2 = schemas.SkillBase(
 
 
 class TestCreateSkill:
-    def test_create_skill(self, get_db_session: orm.Session, setup_db: Any) -> None:
+    @staticmethod
+    def test_create_skill(get_db_session: orm.Session, setup_db: Any) -> None:
         skill = schemas.SkillBase(
             skill_name="python", level_of_confidence=schemas.LevelOfConfidence.LEVEL_1
         )
@@ -49,21 +50,22 @@ class TestCreateSkill:
 
 
 class TestGetSkills:
-    def test_get_zero_skills(self, get_db_session: orm.Session, setup_db: Any) -> None:
+    @staticmethod
+    def test_get_zero_skills(get_db_session: orm.Session, setup_db: Any) -> None:
         skill = crud.get_skills(get_db_session)
         assert skill == []
         assert len(skill) == 0
 
-    def test_get_one_skill(self, get_db_session: orm.Session, setup_db: Any) -> None:
+    @staticmethod
+    def test_get_one_skill(get_db_session: orm.Session, setup_db: Any) -> None:
         crud.create_skill(session=get_db_session, skill=SKILL_1)
         skills = crud.get_skills(get_db_session)
         assert len(skills) == 1
         assert skills[0].skill_name == "python"
         assert skills[0].level_of_confidence == schemas.LevelOfConfidence.LEVEL_2
 
-    def test_get_multiple_skills(
-        self, get_db_session: orm.Session, setup_db: Any
-    ) -> None:
+    @staticmethod
+    def test_get_multiple_skills(get_db_session: orm.Session, setup_db: Any) -> None:
         crud.create_skill(get_db_session, SKILL_1)
         crud.create_skill(get_db_session, SKILL_2)
         skills = crud.get_skills(get_db_session)
