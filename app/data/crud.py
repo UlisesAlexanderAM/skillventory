@@ -7,7 +7,14 @@ from sqlalchemy import orm
 from app.models import schemas, models
 
 
-def create_skill(session: orm.Session, skill: schemas.Skill):
+def get_skill_by_name(session: orm.Session, skill_name: str) -> models.Skill | None:
+    stmt: sqlalchemy.Select[tuple[models.Skill]] = sqlalchemy.select(
+        models.Skill
+    ).where(models.Skill.skill_name == skill_name)
+    return session.scalars(stmt).one_or_none()
+
+
+def create_skill(session: orm.Session, skill: schemas.SkillBase) -> None:
     if (
         session.scalar(
             sqlalchemy.select(models.Skill.skill_name).where(
