@@ -37,16 +37,13 @@ SKILL_2 = schemas.SkillBase(
 class TestCreateSkill:
     @staticmethod
     def test_create_skill(get_db_session: orm.Session, setup_db: Any) -> None:
-        skill = schemas.SkillBase(
-            skill_name="python", level_of_confidence=schemas.LevelOfConfidence.LEVEL_1
-        )
-        crud.create_skill(get_db_session, skill)
+        crud.create_skill(get_db_session, SKILL_1)
         stmt: sqlalchemy.Select[tuple[models.Skill]] = sqlalchemy.select(
             models.Skill
         ).where(models.Skill.skill_name == "python")
         skill_db = get_db_session.scalars(stmt).one_or_none()
         assert skill_db.skill_name == "python"
-        assert skill_db.level_of_confidence == schemas.LevelOfConfidence.LEVEL_1
+        assert skill_db.level_of_confidence == schemas.LevelOfConfidence.LEVEL_2
 
 
 class TestGetSkills:
