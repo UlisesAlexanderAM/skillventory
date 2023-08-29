@@ -27,3 +27,9 @@ def get_skills(session: orm.Session) -> Sequence[models.Skill]:
     stmt: sqlalchemy.Select[models.Skill] = sqlalchemy.Select(models.Skill)
     skills: Sequence[models.Skill] = session.scalars(stmt).all()
     return skills
+
+
+def delete_skill(session: orm.Session, skill: models.Skill):
+    if skill:
+        session.delete(skill)
+        session.commit()
