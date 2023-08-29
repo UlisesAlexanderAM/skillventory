@@ -15,14 +15,7 @@ def get_skill_by_name(session: orm.Session, skill_name: str) -> models.Skill | N
 
 
 def create_skill(session: orm.Session, skill: schemas.SkillBase) -> None:
-    if (
-        session.scalar(
-            sqlalchemy.select(models.Skill.skill_name).where(
-                models.Skill.skill_name == skill.skill_name
-            )
-        )
-        is not None
-    ):
+    if get_skill_by_name(session=session, skill_name=skill.skill_name) is not None:
         raise sqlite3.IntegrityError("The skill already exist")
     skill_db = models.Skill(**skill.model_dump())
     session.add(skill_db)

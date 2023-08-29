@@ -56,20 +56,18 @@ class TestGetSkillByName:
 class TestCreateSkill:
     @staticmethod
     def test_create_skill(get_db_session: orm.Session, setup_db: Any) -> None:
-        crud.create_skill(get_db_session, SKILL_1)
-        stmt: sqlalchemy.Select[tuple[models.Skill]] = sqlalchemy.select(
-            models.Skill
-        ).where(models.Skill.skill_name == SKILL_1.skill_name)
-        skill = get_db_session.scalars(stmt).all()
-        assert len(skill) == 1
-        assert skill[0].skill_name == SKILL_1.skill_name
-        assert skill[0].level_of_confidence == SKILL_1.level_of_confidence
+        crud.create_skill(session=get_db_session, skill=SKILL_1)
+        skill: models.Skill | None = crud.get_skill_by_name(
+            session=get_db_session, skill_name=SKILL_1.skill_name
+        )
+        assert skill.skill_name == SKILL_1.skill_name
+        assert skill.level_of_confidence == SKILL_1.level_of_confidence
 
     @staticmethod
     def test_create_skill_already_exist(get_db_session: orm.Session, setup_db: Any):
         with pytest.raises(sqlite3.IntegrityError) as exc_info:
-            crud.create_skill(get_db_session, SKILL_1)
-            crud.create_skill(get_db_session, SKILL_1)
+            crud.create_skill(session=get_db_session, skill=SKILL_1)
+            crud.create_skill(session=get_db_session, skill=SKILL_1)
         assert "The skill already exist" in str(exc_info.value)
 
 
