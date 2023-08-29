@@ -1,6 +1,7 @@
 import pytest
 import sqlalchemy
 from sqlalchemy import orm
+import sqlite3
 from typing import Any
 
 from app.database import config
@@ -44,6 +45,13 @@ class TestCreateSkill:
         skill_db = get_db_session.scalars(stmt).one_or_none()
         assert skill_db.skill_name == "python"
         assert skill_db.level_of_confidence == schemas.LevelOfConfidence.LEVEL_2
+
+    @staticmethod
+    def test_create_skill_already_exist(get_db_session: orm.Session, setup_db: Any):
+        with pytest.raises(sqlite3.IntegrityError) as exc_info:
+            crud.create_skill(get_db_session, SKILL_1)
+            crud.create_skill(get_db_session, SKILL_1)
+        assert "The skill already exist" in str(exc_info.value)
 
 
 class TestGetSkills:
