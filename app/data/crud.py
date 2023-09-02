@@ -7,6 +7,11 @@ from sqlalchemy import orm
 from app.models import schemas, models
 
 
+def get_skill_by_id(session: orm.Session, skill_id: int) -> models.Skill | None:
+    stmt = sqlalchemy.select(models.Skill).where(models.Skill.skill_id == skill_id)
+    return session.scalars(statement=stmt).one_or_none()
+
+
 def get_skill_by_name(session: orm.Session, skill_name: str) -> models.Skill | None:
     stmt: sqlalchemy.Select[tuple[models.Skill]] = sqlalchemy.select(
         models.Skill
