@@ -1,6 +1,7 @@
 import pytest
-from sqlalchemy import orm
 import sqlite3
+import random
+from sqlalchemy import orm
 from typing import Any
 
 from app.database import config
@@ -34,6 +35,26 @@ SKILL_2 = schemas.SkillBase(
 )
 
 
+class TestGetSkillById:
+    @staticmethod
+    def test_get_skill_by_id(get_db_session: orm.Session, setup_db: Any) -> None:
+        crud.create_skill(session=get_db_session, skill=SKILL_1)
+        skill_by_name: models.Skill | None = crud.get_skill_by_name(
+            session=get_db_session, skill_name=SKILL_1.skill_name
+        )
+        assert skill_by_name is not None
+        skill_id = skill_by_name.skill_id
+        skill_by_id = crud.get_skill_by_id(session=get_db_session, skill_id=skill_id)
+        assert skill_by_id is not None
+        assert skill_by_id == skill_by_name
+
+    @staticmethod
+    def test_get_skill_by_id_none(get_db_session: orm.Session, setup_db: Any) -> None:
+        random_number = int(random.random() * 100)
+        skill = crud.get_skill_by_id(session=get_db_session, skill_id=random_number)
+        assert skill is None
+
+
 class TestGetSkillByName:
     @staticmethod
     def test_get_skill_by_name(get_db_session: orm.Session, setup_db: Any) -> None:
@@ -41,6 +62,7 @@ class TestGetSkillByName:
         skill: models.Skill | None = crud.get_skill_by_name(
             session=get_db_session, skill_name=SKILL_1.skill_name
         )
+        assert skill is not None
         assert skill.skill_name == SKILL_1.skill_name
         assert skill.level_of_confidence == SKILL_1.level_of_confidence
 
@@ -59,6 +81,7 @@ class TestCreateSkill:
         skill: models.Skill | None = crud.get_skill_by_name(
             session=get_db_session, skill_name=SKILL_1.skill_name
         )
+        assert skill is not None
         assert skill.skill_name == SKILL_1.skill_name
         assert skill.level_of_confidence == SKILL_1.level_of_confidence
 
