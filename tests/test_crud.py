@@ -142,3 +142,21 @@ class TestDeleteSkill:
             session=get_db_session, skill_name=SKILL_1.skill_name
         )
         assert skill is None
+
+
+class TestUpdateSKill:
+    @staticmethod
+    def test_update_skill_name(get_db_session: orm.Session) -> None:
+        crud.create_skill(session=get_db_session, skill=SKILL_1)
+        skill: models.Skill | None = crud.get_skill_by_name(
+            session=get_db_session, skill_name=SKILL_1.skill_name
+        )
+        assert skill is not None
+        skill_id = skill.skill_id
+        crud.update_skill_name(
+            session=get_db_session, skill_id=skill_id, new_name=SKILL_2.skill_name
+        )
+        skill_updated = crud.get_skill_by_id(session=get_db_session, skill_id=skill_id)
+        assert skill_updated is not None
+        assert skill_updated.skill_name == SKILL_2.skill_name
+        assert skill == skill_updated
