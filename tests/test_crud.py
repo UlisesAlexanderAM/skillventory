@@ -1,8 +1,7 @@
-import pytest
 import sqlite3
 import random
+import pytest
 from sqlalchemy import orm
-from typing import Any
 
 from app.database import config
 from app.data import crud
@@ -18,7 +17,7 @@ def get_db_session():
         db.close()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="function", autouse=True)
 def setup_db(get_db_session: orm.Session):
     try:
         yield config.Base.metadata.create_all(bind=get_db_session.get_bind())
@@ -37,8 +36,7 @@ SKILL_2 = schemas.SkillBase(
 
 class TestGetSkillById:
     @staticmethod
-    def test_get_skill_by_id(get_db_session: orm.Session, setup_db: Any) -> None:
-        crud.create_skill(session=get_db_session, skill=SKILL_1)
+    def test_get_skill_by_id(get_db_session: orm.Session, create_one_skill) -> None:
         skill_by_name: models.Skill | None = crud.get_skill_by_name(
             session=get_db_session, skill_name=SKILL_1.skill_name
         )
@@ -49,7 +47,7 @@ class TestGetSkillById:
         assert skill_by_id == skill_by_name
 
     @staticmethod
-    def test_get_skill_by_id_none(get_db_session: orm.Session, setup_db: Any) -> None:
+    def test_get_skill_by_id_none(
         random_number = int(random.random() * 100)
         skill = crud.get_skill_by_id(session=get_db_session, skill_id=random_number)
         assert skill is None
@@ -57,7 +55,7 @@ class TestGetSkillById:
 
 class TestGetSkillByName:
     @staticmethod
-    def test_get_skill_by_name(get_db_session: orm.Session, setup_db: Any) -> None:
+    def test_get_skill_by_name(get_db_session: orm.Session) -> None:
         crud.create_skill(get_db_session, SKILL_1)
         skill: models.Skill | None = crud.get_skill_by_name(
             session=get_db_session, skill_name=SKILL_1.skill_name
@@ -67,7 +65,7 @@ class TestGetSkillByName:
         assert skill.level_of_confidence == SKILL_1.level_of_confidence
 
     @staticmethod
-    def test_get_skill_by_name_none(get_db_session: orm.Session, setup_db: Any) -> None:
+    def test_get_skill_by_name_none(get_db_session: orm.Session) -> None:
         skill: models.Skill | None = crud.get_skill_by_name(
             session=get_db_session, skill_name=SKILL_1.skill_name
         )
@@ -76,7 +74,7 @@ class TestGetSkillByName:
 
 class TestCreateSkill:
     @staticmethod
-    def test_create_skill(get_db_session: orm.Session, setup_db: Any) -> None:
+    def test_create_skill(get_db_session: orm.Session) -> None:
         crud.create_skill(session=get_db_session, skill=SKILL_1)
         skill: models.Skill | None = crud.get_skill_by_name(
             session=get_db_session, skill_name=SKILL_1.skill_name
@@ -86,7 +84,7 @@ class TestCreateSkill:
         assert skill.level_of_confidence == SKILL_1.level_of_confidence
 
     @staticmethod
-    def test_create_skill_already_exist(get_db_session: orm.Session, setup_db: Any):
+    def test_create_skill_already_exist(get_db_session: orm.Session):
         with pytest.raises(sqlite3.IntegrityError) as exc_info:
             crud.create_skill(session=get_db_session, skill=SKILL_1)
             crud.create_skill(session=get_db_session, skill=SKILL_1)
@@ -95,13 +93,13 @@ class TestCreateSkill:
 
 class TestGetSkills:
     @staticmethod
-    def test_get_zero_skills(get_db_session: orm.Session, setup_db: Any) -> None:
+    def test_get_zero_skills(get_db_session: orm.Session) -> None:
         skill = crud.get_skills(get_db_session)
         assert skill == []
         assert len(skill) == 0
 
     @staticmethod
-    def test_get_one_skill(get_db_session: orm.Session, setup_db: Any) -> None:
+    def test_get_one_skill(get_db_session: orm.Session) -> None:
         crud.create_skill(session=get_db_session, skill=SKILL_1)
         skills = crud.get_skills(get_db_session)
         assert len(skills) == 1
@@ -109,7 +107,7 @@ class TestGetSkills:
         assert skills[0].level_of_confidence == SKILL_1.level_of_confidence
 
     @staticmethod
-    def test_get_multiple_skills(get_db_session: orm.Session, setup_db: Any) -> None:
+    def test_get_multiple_skills(get_db_session: orm.Session) -> None:
         crud.create_skill(get_db_session, SKILL_1)
         crud.create_skill(get_db_session, SKILL_2)
         skills = crud.get_skills(get_db_session)
@@ -122,11 +120,12 @@ class TestGetSkills:
 
 class TestDeleteSkill:
     @staticmethod
-    def test_delete_skill(get_db_session: orm.Session, setup_db: Any) -> None:
+    def test_delete_skill(get_db_session: orm.Session) -> None:
         crud.create_skill(session=get_db_session, skill=SKILL_1)
         skill: models.Skill | None = crud.get_skill_by_name(
             session=get_db_session, skill_name=SKILL_1.skill_name
         )
+        assert skill is not None
         crud.delete_skill(session=get_db_session, skill=skill)
         skill = crud.get_skill_by_name(
             session=get_db_session, skill_name=SKILL_1.skill_name
@@ -134,9 +133,7 @@ class TestDeleteSkill:
         assert skill is None
 
     @staticmethod
-    def test_delete_skill_non_existent(
-        get_db_session: orm.Session, setup_db: Any
-    ) -> None:
+    def test_delete_skill_non_existent(get_db_session: orm.Session) -> None:
         skill: models.Skill | None = crud.get_skill_by_name(
             session=get_db_session, skill_name=SKILL_1.skill_name
         )
