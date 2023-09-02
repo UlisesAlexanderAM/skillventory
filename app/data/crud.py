@@ -49,7 +49,17 @@ def delete_skill(session: orm.Session, skill: models.Skill) -> None:
 
 def update_skill_name(session: orm.Session, skill_id: int, new_name: str) -> None:
     session.execute(
-        sqlalchemy.update(models.Skill),
-        {"skill_id": skill_id, "skill_name": new_name},
+        statement=sqlalchemy.update(table=models.Skill),
+        params={"skill_id": skill_id, "skill_name": new_name},
+    )
+    session.commit()
+
+
+def update_skill_level_of_confidence(
+    session: orm.Session, skill_id: int, new_level: int
+) -> None:
+    session.execute(
+        statement=sqlalchemy.update(table=models.Skill),
+        params={"skill_id": skill_id, "level_of_confidence": new_level},
     )
     session.commit()
