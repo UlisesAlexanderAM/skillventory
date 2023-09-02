@@ -34,7 +34,15 @@ def get_skills(session: orm.Session) -> Sequence[models.Skill]:
     return skills
 
 
-def delete_skill(session: orm.Session, skill: models.Skill):
+def delete_skill(session: orm.Session, skill: models.Skill) -> None:
     if skill:
         session.delete(skill)
         session.commit()
+
+
+def update_skill_name(session: orm.Session, skill_id: int, new_name: str) -> None:
+    session.execute(
+        sqlalchemy.update(models.Skill),
+        {"skill_id": skill_id, "skill_name": new_name},
+    )
+    session.commit()
