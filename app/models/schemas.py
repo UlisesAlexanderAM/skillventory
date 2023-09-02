@@ -19,6 +19,8 @@ class SkillBase(pydantic.BaseModel):
     skill_name: str
     level_of_confidence: LevelOfConfidence
 
+    model_config = pydantic.ConfigDict(from_attributes=True)
+
 
 class PlaceWithGreaterInterestBase(pydantic.BaseModel):
     """Model of the place with greater interest"""
