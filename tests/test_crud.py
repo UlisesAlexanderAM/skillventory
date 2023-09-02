@@ -1,12 +1,13 @@
 import sqlite3
 import random
 import pytest
+from collections.abc import Sequence, Callable
 from sqlalchemy.orm import Session
 from typing import Generator, Any
 
 from app.database import config
 from app.data import crud
-from app.models.schemas import SkillBase as skill_schema
+from app.models.schemas import LevelOfConfidence, SkillBase as skill_schema
 from app.models.models import Skill as skill_model
 from app.models import schemas
 
@@ -34,15 +35,32 @@ def random_number() -> Generator[int, Any, None]:
 
 
 @pytest.fixture(scope="session")
-def skill_1() -> Generator[skill_schema, Any, None]:
-    yield schemas.SkillBase(
+def skill_factory() -> Generator[Callable[..., skill_schema], Any, None]:
+    def _skill_factory(
+        skill_name: str, level_of_confidence: LevelOfConfidence
+    ) -> skill_schema:
+        skill = schemas.SkillBase(
+            skill_name=skill_name, level_of_confidence=level_of_confidence
+        )
+        return skill
+
+    yield _skill_factory
+
+
+@pytest.fixture(scope="session")
+def skill_1(
+    skill_factory: Callable[..., skill_schema]
+) -> Generator[skill_schema, Any, None]:
+    yield skill_factory(
         skill_name="python", level_of_confidence=schemas.LevelOfConfidence.LEVEL_2
     )
 
 
 @pytest.fixture(scope="session")
-def skill_2():
-    yield skill_schema(
+def skill_2(
+    skill_factory: Callable[..., skill_schema]
+) -> Generator[skill_schema, Any, None]:
+    yield skill_factory(
         skill_name="typescript",
         level_of_confidence=schemas.LevelOfConfidence.LEVEL_1,
     )
@@ -71,24 +89,38 @@ def create_two_skill(
 def get_skill_id(
     get_db_session: Session, create_one_skill: skill_schema
 ) -> Generator[int, Any, None]:
-    skill: skill_model | None = crud.get_skill_by_name(
+    _skill: skill_model | None = crud.get_skill_by_name(
         session=get_db_session, skill_name=create_one_skill.skill_name
     )
-    if skill is not None:
-        yield skill.skill_id
+    if _skill is not None:
+        yield _skill.skill_id
+
+
+@pytest.fixture(scope="function")
+def get_skill(
+    get_db_session: Session, create_one_skill: skill_schema
+) -> Generator[skill_model, Any, None]:
+    _skill: skill_model | None = crud.get_skill_by_name(
+        session=get_db_session, skill_name=create_one_skill.skill_name
+    )
+    if _skill is not None:
+        yield _skill
 
 
 class TestGetSkillById:
     @staticmethod
-    def test_get_skill_by_id(get_db_session: Session, get_skill_id) -> None:
-        skill_id = get_skill_id
-        skill_by_id = crud.get_skill_by_id(session=get_db_session, skill_id=skill_id)
+    def test_get_skill_by_id(get_db_session: Session, get_skill_id: int) -> None:
+        skill_by_id: skill_model | None = crud.get_skill_by_id(
+            session=get_db_session, skill_id=get_skill_id
+        )
         assert skill_by_id is not None
         assert skill_by_id.skill_id == 1
 
     @staticmethod
     def test_get_skill_by_id_none(get_db_session: Session, random_number: int) -> None:
-        skill = crud.get_skill_by_id(session=get_db_session, skill_id=random_number)
+        skill: skill_model | None = crud.get_skill_by_id(
+            session=get_db_session, skill_id=random_number
+        )
         assert skill is None
 
 
@@ -116,17 +148,20 @@ class TestGetSkillByName:
 
 class TestCreateSkill:
     @staticmethod
-    def test_create_skill(get_db_session: Session, skill_1: skill_schema) -> None:
-        crud.create_skill(session=get_db_session, skill=skill_1)
+    def test_create_skill(
+        get_db_session: Session, create_one_skill: skill_schema
+    ) -> None:
         skill: skill_model | None = crud.get_skill_by_name(
-            session=get_db_session, skill_name=skill_1.skill_name
+            session=get_db_session, skill_name=create_one_skill.skill_name
         )
         assert skill is not None
-        assert skill.skill_name == skill_1.skill_name
-        assert skill.level_of_confidence == skill_1.level_of_confidence
+        assert skill.skill_name == create_one_skill.skill_name
+        assert skill.level_of_confidence == create_one_skill.level_of_confidence
 
     @staticmethod
-    def test_create_skill_already_exist(get_db_session: Session, skill_1: skill_schema):
+    def test_create_skill_already_exist(
+        get_db_session: Session, skill_1: skill_schema
+    ) -> None:
         with pytest.raises(sqlite3.IntegrityError) as exc_info:
             crud.create_skill(session=get_db_session, skill=skill_1)
             crud.create_skill(session=get_db_session, skill=skill_1)
@@ -136,7 +171,7 @@ class TestCreateSkill:
 class TestGetSkills:
     @staticmethod
     def test_get_zero_skills(get_db_session: Session) -> None:
-        skill = crud.get_skills(get_db_session)
+        skill: Sequence[skill_model] = crud.get_skills(session=get_db_session)
         assert skill == []
         assert len(skill) == 0
 
@@ -144,7 +179,7 @@ class TestGetSkills:
     def test_get_one_skill(
         get_db_session: Session, create_one_skill: skill_schema
     ) -> None:
-        skills = crud.get_skills(get_db_session)
+        skills: Sequence[skill_model] = crud.get_skills(get_db_session)
         assert len(skills) == 1
         assert skills[0].skill_name == create_one_skill.skill_name
         assert skills[0].level_of_confidence == create_one_skill.level_of_confidence
@@ -153,7 +188,7 @@ class TestGetSkills:
     def test_get_multiple_skills(
         get_db_session: Session, create_two_skill: tuple[skill_schema, skill_schema]
     ) -> None:
-        skills = crud.get_skills(get_db_session)
+        skills: Sequence[skill_model] = crud.get_skills(get_db_session)
         skill_1, skill_2 = create_two_skill
         assert len(skills) == 2
         assert skills[0].skill_name == skill_1.skill_name
@@ -164,29 +199,23 @@ class TestGetSkills:
 
 class TestDeleteSkill:
     @staticmethod
-    def test_delete_skill(
-        get_db_session: Session, create_one_skill: skill_schema
-    ) -> None:
-        skill: skill_model | None = crud.get_skill_by_name(
-            session=get_db_session, skill_name=create_one_skill.skill_name
-        )
+    def test_delete_skill(get_db_session: Session, get_skill: skill_model) -> None:
+        skill: skill_model | None = get_skill
         assert skill is not None
         crud.delete_skill(session=get_db_session, skill=skill)
         skill = crud.get_skill_by_name(
-            session=get_db_session, skill_name=create_one_skill.skill_name
+            session=get_db_session, skill_name=get_skill.skill_name
         )
         assert skill is None
 
     @staticmethod
     def test_delete_skill_non_existent(
-        get_db_session: Session, skill_1: skill_schema
+        get_db_session: Session, get_skill: skill_model
     ) -> None:
-        skill: skill_model | None = crud.get_skill_by_name(
-            session=get_db_session, skill_name=skill_1.skill_name
-        )
+        skill: skill_model = get_skill
         crud.delete_skill(session=get_db_session, skill=skill)
         skill = crud.get_skill_by_name(
-            session=get_db_session, skill_name=skill_1.skill_name
+            session=get_db_session, skill_name=get_skill.skill_name
         )
         assert skill is None
 
@@ -200,7 +229,9 @@ class TestUpdateSKill:
         crud.update_skill_name(
             session=get_db_session, skill_id=skill_id, new_name=skill_2.skill_name
         )
-        skill_updated = crud.get_skill_by_id(session=get_db_session, skill_id=skill_id)
+        skill_updated: skill_model | None = crud.get_skill_by_id(
+            session=get_db_session, skill_id=skill_id
+        )
         assert skill_updated is not None
         assert skill_updated.skill_name == skill_2.skill_name
         assert skill_updated.skill_id == skill_id
