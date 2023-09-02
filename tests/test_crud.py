@@ -118,10 +118,10 @@ class TestGetSkillById:
 
     @staticmethod
     def test_get_skill_by_id_none(get_db_session: Session, random_number: int) -> None:
-        skill: skill_model | None = crud.get_skill_by_id(
-            session=get_db_session, skill_id=random_number
-        )
-        assert skill is None
+        with pytest.warns(
+            UserWarning, match=f"The skill with id {random_number} doesn't exists"
+        ):
+            crud.get_skill_by_id(session=get_db_session, skill_id=random_number)
 
 
 class TestGetSkillByName:
@@ -140,10 +140,12 @@ class TestGetSkillByName:
     def test_get_skill_by_name_none(
         get_db_session: Session, skill_1: skill_schema
     ) -> None:
-        skill: skill_model | None = crud.get_skill_by_name(
-            session=get_db_session, skill_name=skill_1.skill_name
-        )
-        assert skill is None
+        with pytest.warns(
+            UserWarning, match=f"The skill named {skill_1.skill_name} doesn't exists"
+        ):
+            crud.get_skill_by_name(
+                session=get_db_session, skill_name=skill_1.skill_name
+            )
 
 
 class TestCreateSkill:
@@ -203,10 +205,10 @@ class TestDeleteSkill:
         skill: skill_model | None = get_skill
         assert skill is not None
         crud.delete_skill(session=get_db_session, skill=skill)
-        skill = crud.get_skill_by_name(
-            session=get_db_session, skill_name=get_skill.skill_name
-        )
-        assert skill is None
+        with pytest.warns(
+            UserWarning, match=f"The skill named {skill.skill_name} doesn't exists"
+        ):
+            crud.get_skill_by_name(session=get_db_session, skill_name=skill.skill_name)
 
     @staticmethod
     def test_delete_skill_non_existent(
@@ -214,10 +216,10 @@ class TestDeleteSkill:
     ) -> None:
         skill: skill_model = get_skill
         crud.delete_skill(session=get_db_session, skill=skill)
-        skill = crud.get_skill_by_name(
-            session=get_db_session, skill_name=get_skill.skill_name
-        )
-        assert skill is None
+        with pytest.warns(
+            UserWarning, match=f"The skill named {skill.skill_name} doesn't exists"
+        ):
+            crud.get_skill_by_name(session=get_db_session, skill_name=skill.skill_name)
 
 
 class TestUpdateSKill:
