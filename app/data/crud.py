@@ -1,22 +1,29 @@
 """CRUD functions"""
-from collections.abc import Sequence
 import sqlite3
 import sqlalchemy
+import warnings
 from sqlalchemy import orm
+from collections.abc import Sequence
 
 from app.models import schemas, models
 
 
 def get_skill_by_id(session: orm.Session, skill_id: int) -> models.Skill | None:
     stmt = sqlalchemy.select(models.Skill).where(models.Skill.skill_id == skill_id)
-    return session.scalars(statement=stmt).one_or_none()
+    skill = session.scalars(statement=stmt).one_or_none()
+    if skill is None:
+        warnings.warn(message=f"The skill with id {skill_id} doesn't exits")
+    return skill
 
 
 def get_skill_by_name(session: orm.Session, skill_name: str) -> models.Skill | None:
     stmt: sqlalchemy.Select[tuple[models.Skill]] = sqlalchemy.select(
         models.Skill
     ).where(models.Skill.skill_name == skill_name)
-    return session.scalars(stmt).one_or_none()
+    skill = session.scalars(stmt).one_or_none()
+    if skill is None:
+        warnings.warn(f"The skill named {skill_name} doesn't exists")
+    return skill
 
 
 def create_skill(session: orm.Session, skill: schemas.SkillBase) -> None:
