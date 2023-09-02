@@ -12,7 +12,7 @@ def get_skill_by_id(session: orm.Session, skill_id: int) -> models.Skill | None:
     stmt = sqlalchemy.select(models.Skill).where(models.Skill.skill_id == skill_id)
     skill = session.scalars(statement=stmt).one_or_none()
     if skill is None:
-        warnings.warn(message=f"The skill with id {skill_id} doesn't exits")
+        warnings.warn(message=f"The skill with id {skill_id} doesn't exists")
     return skill
 
 
