@@ -239,5 +239,18 @@ class TestUpdateSKill:
         assert skill_updated.skill_id == skill_id
 
     @staticmethod
-    def test_update_skill_name_none(get_db_session: Session) -> None:
-        pass
+    def test_update_skill_level_of_confidence(
+        get_db_session: Session, get_skill_id: int, skill_2: skill_schema
+    ) -> None:
+        skill_id: int = get_skill_id
+        crud.update_skill_level_of_confidence(
+            session=get_db_session,
+            skill_id=skill_id,
+            new_level=skill_2.level_of_confidence,
+        )
+        skill_updated: skill_model | None = crud.get_skill_by_id(
+            session=get_db_session, skill_id=skill_id
+        )
+        assert skill_updated is not None
+        assert skill_updated.level_of_confidence == skill_2.level_of_confidence
+        assert skill_updated.skill_id == skill_id
