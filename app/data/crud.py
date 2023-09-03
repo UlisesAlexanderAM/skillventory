@@ -56,7 +56,7 @@ def update_skill_name(session: orm.Session, skill_id: int, new_name: str) -> Non
 
 
 def update_skill_level_of_confidence(
-    session: orm.Session, skill_id: int, new_level: int
+    session: orm.Session, skill_id: int, new_level: schemas.LevelOfConfidence
 ) -> None:
     session.execute(
         statement=sqlalchemy.update(table=models.Skill),
