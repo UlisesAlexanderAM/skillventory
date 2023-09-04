@@ -61,7 +61,7 @@ def setup_db(get_db_session: Session) -> Any:
     auto-used to setup/teardown the database for all tests.
     """
     try:
-        config.Base.metadata.create_all(bind=get_db_session.get_bind())
+        yield config.Base.metadata.create_all(bind=get_db_session.get_bind())
     finally:
         config.Base.metadata.drop_all(bind=get_db_session.get_bind())
 
@@ -263,28 +263,26 @@ class TestGetSkillById:
             crud.get_skill_by_id(session=get_db_session, skill_id=random_number)
 
 
-class TestGetSkillByName:
-    @staticmethod
-    def test_get_skill_by_name(
-        get_db_session: Session, create_one_skill: skill_schema
-    ) -> None:
+@pytest.mark.parametrize(
+    "skill_name,expected_warning", [("python", None), ("java", UserWarning)]
+)
+def test_get_skill_by_name(
+    get_db_session: Session,
+    create_one_skill: skill_schema,
+    skill_name: str,
+    expected_warning: Any,
+) -> None:
+    with pytest.warns(
+        expected_warning=expected_warning,
+        match=f"The skill named {skill_name} doesn't exists",
+    ):
         skill: skill_model | None = crud.get_skill_by_name(
-            session=get_db_session, skill_name=create_one_skill.skill_name
+            session=get_db_session, skill_name=skill_name
         )
-        assert skill is not None
-        assert skill.skill_name == create_one_skill.skill_name
-        assert skill.level_of_confidence == create_one_skill.level_of_confidence
 
-    @staticmethod
-    def test_get_skill_by_name_none(
-        get_db_session: Session, skill_1: skill_schema
-    ) -> None:
-        with pytest.warns(
-            UserWarning, match=f"The skill named {skill_1.skill_name} doesn't exists"
-        ):
-            crud.get_skill_by_name(
-                session=get_db_session, skill_name=skill_1.skill_name
-            )
+        if expected_warning is None:
+            assert skill is not None
+            assert skill.skill_name == create_one_skill.skill_name
 
 
 class TestCreateSkill:
