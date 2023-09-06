@@ -6,7 +6,6 @@ operations on skills using a test database session fixture.
 Fixtures:
 - get_db_session: Module scoped session fixture.
 - setup_db: Function scoped setup/teardown fixture.  
-- random_number: Function scoped random number fixture.
 - skill_factory: Session scoped skill factory fixture.
 - skill_1: Session scoped fixture for a sample skill.
 - skill_2: Session scoped fixture for another sample skill.
@@ -64,19 +63,6 @@ def setup_db(get_db_session: Session) -> Any:
         yield config.Base.metadata.create_all(bind=get_db_session.get_bind())
     finally:
         config.Base.metadata.drop_all(bind=get_db_session.get_bind())
-
-
-@pytest.fixture(scope="function")
-def random_number() -> Iterator[int]:
-    """Gets a random number fixture.
-
-    Yields:
-        The random number.
-
-    This is a function scoped fixture that yields a random number.
-    The random number is reset after the test finishes executing.
-    """
-    yield int(random.random() * 100)
 
 
 @pytest.fixture(scope="session")
@@ -223,21 +209,27 @@ def get_skill_id(
         yield _skill.skill_id
 
 
-@pytest.fixture(scope="function")
-def get_skill(
-    get_db_session: Session, create_one_skill: skill_schema
-) -> Iterator[skill_model]:
-    """Gets the created skill from the database.
+@pytest.mark.parametrize("skill_id,expected_warning", [(1, None), (2, UserWarning)])
+def test_get_skill_by_id(
+    get_db_session: Session,
+    create_one_skill: skill_model,
+    skill_id: int,
+    expected_warning: Any,
+) -> None:
+    """Tests getting a skill by ID.
 
     Args:
-        get_db_session (Session): The database session fixture.
-        create_one_skill (skill_schema): The created skill fixture.
+        get_db_session: The database session fixture.
+        create_one_skill: The create_one_skill fixture.
+        skill_id: The ID of the skill to get.
+        expected_warning: The expected warning or None.
 
-    Yields:
-        _skill (skill_model): The created skill object.
+    This test is parameterized on skill_id and expected_warning.
+    It gets a skill by ID from the database using the crud.get_skill_by_id()
+    function.
 
-    This fixture queries the database using the session and skill name
-    from the create_one_skill fixture. It yields the skill object if found.
+    It expects a UserWarning if the skill does not exist, or no warning if it does.
+    The warning match is checked and the returned skill is validated if no warning.
     """
     _skill: skill_model | None = crud.get_skill_by_name(
         session=get_db_session, skill_name=create_one_skill.skill_name
