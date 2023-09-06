@@ -2,7 +2,7 @@
 
 import enum
 import pydantic
-from typing import Optional
+from typing import Optional, TypeAlias
 
 
 class LevelOfConfidence(enum.Enum):
@@ -43,3 +43,7 @@ class PlaceWithGreaterInterest(PlaceWithGreaterInterestBase):
     skilss: list[SkillBase]
 
     model_config = pydantic.ConfigDict(from_attributes=True)
+
+
+skill_base_schema: TypeAlias = SkillBase
+skill_schema: TypeAlias = Skill

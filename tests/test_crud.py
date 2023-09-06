@@ -14,7 +14,6 @@ The tests will execute CRUD operations on skills using the fixtures
 to test the CRUD functions and validate the results.
 """
 
-import random
 import sqlite3
 from collections.abc import Callable, Sequence, Iterator
 from typing import Any, Literal
@@ -27,7 +26,7 @@ from app.database import config
 from app.models import schemas
 from app.models.models import Skill as skill_model
 from app.models.schemas import LevelOfConfidence
-from app.models.schemas import SkillBase as skill_schema
+from app.models.schemas import skill_base_schema
 
 
 @pytest.fixture(scope="module")
@@ -66,7 +65,7 @@ def setup_db(get_db_session: Session) -> Any:
 
 
 @pytest.fixture(scope="session")
-def skill_factory() -> Iterator[Callable[[str, LevelOfConfidence], skill_schema]]:
+def skill_factory() -> Iterator[Callable[[str, LevelOfConfidence], skill_base_schema]]:
     """Gets a skill factory fixture.
 
     Yields:
@@ -78,7 +77,7 @@ def skill_factory() -> Iterator[Callable[[str, LevelOfConfidence], skill_schema]
 
     def _skill_factory(
         skill_name: str, level_of_confidence: LevelOfConfidence
-    ) -> skill_schema:
+    ) -> skill_base_schema:
         """Creates a Skill schema object.
 
         Args:
@@ -102,8 +101,8 @@ def skill_factory() -> Iterator[Callable[[str, LevelOfConfidence], skill_schema]
 
 @pytest.fixture(scope="session")
 def skill_1(
-    skill_factory: Callable[[str, LevelOfConfidence], skill_schema]
-) -> Iterator[skill_schema]:
+    skill_factory: Callable[[str, LevelOfConfidence], skill_base_schema]
+) -> Iterator[skill_base_schema]:
     """Gets a skill_1 fixture.
 
     Args:
@@ -121,8 +120,8 @@ def skill_1(
 
 @pytest.fixture(scope="session")
 def skill_2(
-    skill_factory: Callable[[str, LevelOfConfidence], skill_schema]
-) -> Iterator[skill_schema]:
+    skill_factory: Callable[[str, LevelOfConfidence], skill_base_schema]
+) -> Iterator[skill_base_schema]:
     """Gets a skill_2 fixture.
 
     Args:
@@ -140,8 +139,8 @@ def skill_2(
 
 @pytest.fixture(scope="function")
 def create_one_skill(
-    get_db_session: Session, skill_1: skill_schema
-) -> Iterator[skill_schema]:
+    get_db_session: Session, skill_1: skill_base_schema
+) -> Iterator[skill_base_schema]:
     """Creates one skill in the database.
 
     Args:
@@ -155,15 +154,17 @@ def create_one_skill(
     to create one skill in the database. It yields the created
     skill object.
     """
-    _skill_1: skill_schema = skill_1
+    _skill_1: skill_base_schema = skill_1
     crud.create_skill(session=get_db_session, skill=_skill_1)
     yield _skill_1
 
 
 @pytest.fixture(scope="function")
 def create_two_skill(
-    get_db_session: Session, create_one_skill: skill_schema, skill_2: skill_schema
-) -> Iterator[tuple[skill_schema, skill_schema]]:
+    get_db_session: Session,
+    create_one_skill: skill_base_schema,
+    skill_2: skill_base_schema,
+) -> Iterator[tuple[skill_base_schema, skill_base_schema]]:
     """Creates two skills in the database.
 
     Args:
@@ -179,15 +180,15 @@ def create_two_skill(
     to create two skills in the database. It yields the created
     skill_1 and skill_2 objects.
     """
-    _skill_1: skill_schema = create_one_skill
-    _skill_2: skill_schema = skill_2
+    _skill_1: skill_base_schema = create_one_skill
+    _skill_2: skill_base_schema = skill_2
     crud.create_skill(session=get_db_session, skill=_skill_2)
     yield _skill_1, _skill_2
 
 
 @pytest.fixture(scope="function")
 def get_skill_id(
-    get_db_session: Session, create_one_skill: skill_schema
+    get_db_session: Session, create_one_skill: skill_base_schema
 ) -> Iterator[int]:
     """Gets the skill ID from the created skill.
 
@@ -249,7 +250,7 @@ def test_get_skill_by_id(
 )
 def test_get_skill_by_name(
     get_db_session: Session,
-    create_one_skill: skill_schema,
+    create_one_skill: skill_base_schema,
     skill_name: str,
     expected_warning: Any,
 ) -> None:
@@ -280,7 +281,7 @@ def test_get_skill_by_name(
 
 @pytest.mark.parametrize("expected_exception", [None, sqlite3.IntegrityError])
 def test_create_skill(
-    get_db_session: Session, skill_1: skill_schema, expected_exception: Any
+    get_db_session: Session, skill_1: skill_base_schema, expected_exception: Any
 ) -> None:
     """Tests creating a skill.
 
@@ -318,7 +319,7 @@ class TestGetSkills:
 
     @staticmethod
     def test_get_one_skill(
-        get_db_session: Session, create_one_skill: skill_schema
+        get_db_session: Session, create_one_skill: skill_base_schema
     ) -> None:
         skills: Sequence[skill_model] = crud.get_skills(get_db_session)
         assert len(skills) == 1
@@ -327,7 +328,8 @@ class TestGetSkills:
 
     @staticmethod
     def test_get_multiple_skills(
-        get_db_session: Session, create_two_skill: tuple[skill_schema, skill_schema]
+        get_db_session: Session,
+        create_two_skill: tuple[skill_base_schema, skill_base_schema],
     ) -> None:
         skills: Sequence[skill_model] = crud.get_skills(get_db_session)
         skill_1, skill_2 = create_two_skill
@@ -341,8 +343,8 @@ class TestGetSkills:
 @pytest.mark.parametrize("number_of_skills", [0, 1, 2])
 def test_get_skills(
     get_db_session: Session,
-    skill_1: skill_schema,
-    skill_2: skill_schema,
+    skill_1: skill_base_schema,
+    skill_2: skill_base_schema,
     number_of_skills: Literal[0, 1, 2],
 ) -> None:
     if number_of_skills == 1:
@@ -390,7 +392,7 @@ def test_delete_skill(
 
 
 def test_update_skill_name(
-    get_db_session: Session, get_skill_id: int, skill_2: skill_schema
+    get_db_session: Session, get_skill_id: int, skill_2: skill_base_schema
 ) -> None:
     skill_id: int = get_skill_id
     crud.update_skill_name(
@@ -405,7 +407,7 @@ def test_update_skill_name(
 
 
 def test_update_skill_level_of_confidence(
-    get_db_session: Session, get_skill_id: int, skill_2: skill_schema
+    get_db_session: Session, get_skill_id: int, skill_2: skill_base_schema
 ) -> None:
     skill_id: int = get_skill_id
     crud.update_skill_level_of_confidence(
