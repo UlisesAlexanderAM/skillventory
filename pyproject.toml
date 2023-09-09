@@ -14,12 +14,41 @@ fastapi = "^0.100.1"
 SQLAlchemy = "^2.0.19"
 pydantic-settings = "^2.0.2"
 pydantic = "^2.1.1"
+uvicorn = { extras = ["standard"], version = "^0.23.2" }
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
 ruff = "^0.0.282"
 mypy = "^1.4.1"
 pytest = "^7.4.0"
+httpx = "^0.24.1"
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+
+follow_imports = "silent"
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+
+# for strict mypy: (this is the tricky one :-))
+disallow_untyped_defs = true
+
+[tool.ruff]
+select = ["E", "F", "W", "N", "D", "B", "Q", "C90", "ICN", "TID", "PL", "RUF"]
+ignore = ["E501", "D407"]
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
 
 [build-system]
 requires = ["poetry-core"]
