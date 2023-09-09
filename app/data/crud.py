@@ -1,11 +1,12 @@
 """CRUD functions"""
 import sqlite3
-import sqlalchemy
 import warnings
-from sqlalchemy import orm
 from collections.abc import Sequence
 
-from app.models import schemas, models
+import sqlalchemy
+from sqlalchemy import orm
+
+from app.models import models, schemas
 
 
 def get_skill_by_id(session: orm.Session, skill_id: int) -> models.Skill | None:
