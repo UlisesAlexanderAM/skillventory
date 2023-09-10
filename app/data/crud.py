@@ -13,7 +13,9 @@ def get_skill_by_id(session: orm.Session, skill_id: int) -> skill_model | None:
     stmt = sqlalchemy.select(skill_model).where(skill_model.skill_id == skill_id)
     skill = session.scalars(statement=stmt).one_or_none()
     if skill is None:
-        warnings.warn(message=f"The skill with id {skill_id} doesn't exists")
+        warnings.warn(
+            message=f"The skill with id {skill_id} doesn't exists", stacklevel=2
+        )
     return skill
 
 
@@ -23,7 +25,7 @@ def get_skill_by_name(session: orm.Session, skill_name: str) -> skill_model | No
     )
     skill = session.scalars(stmt).one_or_none()
     if skill is None:
-        warnings.warn(f"The skill named {skill_name} doesn't exists")
+        warnings.warn(f"The skill named {skill_name} doesn't exists", stacklevel=2)
     return skill
 
 
