@@ -22,8 +22,8 @@ import pytest
 from sqlalchemy.orm import Session
 
 from app.data import crud
-from app.models.models import Skill as skill_model
-from app.models.schemas import skill_base_schema
+from app.models.type_aliases import skill_base_schema, skill_model
+
 
 
 @pytest.mark.parametrize("skill_id,expected_warning", [(1, None), (2, UserWarning)])

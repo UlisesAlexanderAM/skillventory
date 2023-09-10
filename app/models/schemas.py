@@ -44,6 +44,5 @@ class PlaceWithGreaterInterest(PlaceWithGreaterInterestBase):
 
     model_config = pydantic.ConfigDict(from_attributes=True)
 
-
 skill_base_schema: TypeAlias = SkillBase
 skill_schema: TypeAlias = Skill

@@ -7,8 +7,7 @@ from sqlalchemy.orm import Session
 from app.data import crud
 from app.database import config
 from app.models import schemas
-from app.models.models import Skill as skill_model
-from app.models.schemas import LevelOfConfidence, skill_base_schema
+from app.models.type_aliases import skill_base_schema, skill_model, level_of_confidence
 
 
 @pytest.fixture(scope="module")
@@ -47,7 +46,9 @@ def setup_db(get_db_session: Session) -> Any:
 
 
 @pytest.fixture(scope="session")
-def skill_factory() -> Iterator[Callable[[str, LevelOfConfidence], skill_base_schema]]:
+def skill_factory() -> (
+    Iterator[Callable[[str, level_of_confidence], skill_base_schema]]
+):
     """Gets a skill factory fixture.
 
     Yields:
@@ -58,12 +59,12 @@ def skill_factory() -> Iterator[Callable[[str, LevelOfConfidence], skill_base_sc
     """
 
     def _skill_factory(
-        skill_name: str, level_of_confidence: LevelOfConfidence
+        skill_name: str, level_of_confidence: level_of_confidence
     ) -> skill_base_schema:
         """Creates a Skill schema object.
 
         Args:
-            skill_name  The name of the skill.
+            skill_name: The name of the skill.
             level_of_confidence: The level of confidence for the skill.
 
         Returns:
@@ -83,7 +84,7 @@ def skill_factory() -> Iterator[Callable[[str, LevelOfConfidence], skill_base_sc
 
 @pytest.fixture(scope="session")
 def skill_1(
-    skill_factory: Callable[[str, LevelOfConfidence], skill_base_schema]
+    skill_factory: Callable[[str, level_of_confidence], skill_base_schema]
 ) -> Iterator[skill_base_schema]:
     """Gets a skill_1 fixture.
 
@@ -102,7 +103,7 @@ def skill_1(
 
 @pytest.fixture(scope="session")
 def skill_2(
-    skill_factory: Callable[[str, LevelOfConfidence], skill_base_schema]
+    skill_factory: Callable[[str, level_of_confidence], skill_base_schema]
 ) -> Iterator[skill_base_schema]:
     """Gets a skill_2 fixture.
 
