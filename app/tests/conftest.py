@@ -1,3 +1,22 @@
+"""Fixtures for pytest tests.
+
+This module contains shared fixtures used in the pytest test suite.
+
+Fixtures:
+
+- get_db_session: Module scoped session fixture.
+- setup_db: Function scoped setup/teardown fixture.
+- skill_factory: Session scoped skill factory fixture.
+- skill_1: Sample skill fixture.
+- skill_2: Another sample skill fixture.
+- create_one_skill: Creates one skill fixture.
+- create_two_skills: Creates two skills fixture.
+- get_skill_id: Gets ID of created skill fixture.
+
+The fixtures handle setup/teardown of the database for each test function
+and provide reusable objects for tests.
+"""
+
 from collections.abc import Callable, Iterator
 from typing import Any
 

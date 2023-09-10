@@ -1,17 +1,26 @@
 """Tests for CRUD operations on skills.
 
-This module contains tests for CRUD (create, read, update, delete)
-operations on skills using a test database session fixture.
+This module contains tests for the CRUD (create, read, update, delete)
+operations for skills using a test database session fixture.
 
 Fixtures:
 - get_db_session: Module scoped session fixture.
 - setup_db: Function scoped setup/teardown fixture.
 - skill_factory: Session scoped skill factory fixture.
-- skill_1: Session scoped fixture for a sample skill.
-- skill_2: Session scoped fixture for another sample skill.
+- skill_1: Sample skill fixture.
+- skill_2: Another sample skill fixture.
 
-The tests will execute CRUD operations on skills using the fixtures
-to test the CRUD functions and validate the results.
+The tests call the CRUD functions defined in app/data/crud.py and
+validate the results using the fixtures and expected values.
+
+Tests:
+- test_create_skill: Tests creating a new skill.
+- test_get_skill_by_id: Tests getting a skill by ID.
+- test_get_skill_by_name: Tests getting a skill by the skill's name.
+- test_get_skills: Tests getting all skills.
+- test_update_skill_name: Tests updating a skill's name.
+- test_update_skill_level_of_confidence: Tests updating a skill's level of confidence
+- test_delete_skill: Tests deleting a skill.
 """
 
 import sqlite3
@@ -128,8 +137,33 @@ def test_create_skill(
 
 
 class TestGetSkills:
+    """Tests for getting skills from the database.
+
+    This class contains tests for retrieving skills from the
+    database using the crud.get_skills() function.
+
+    Methods:
+    - test_get_zero_skills: Validates getting no skills.
+    - test_get_one_skill: Validates getting one skill.
+    - test_get_multiple_skills: Validates getting multiple skills.
+
+    The tests validate the number of skills returned and that
+    their attributes match the expected values.
+    """
+
     @staticmethod
     def test_get_zero_skills(get_db_session: Session) -> None:
+        """Tests getting zero skills from the database.
+
+        Args:
+            get_db_session: The database session fixture.
+
+        This test does the following:
+
+        1. Gets all skills from the empty database.
+        2. Validates an empty list is returned.
+        3. Validates the length of the list is 0.
+        """
         skill: Sequence[skill_model] = crud.get_skills(session=get_db_session)
         assert skill == []
         assert len(skill) == 0
@@ -138,7 +172,19 @@ class TestGetSkills:
     def test_get_one_skill(
         get_db_session: Session, create_one_skill: skill_base_schema
     ) -> None:
-        skills: Sequence[skill_model] = crud.get_skills(get_db_session)
+        """Tests getting one skill from the database.
+
+        Args:
+            get_db_session: The database session fixture.
+            create_one_skill: The fixture to create one sample skill.
+
+        This test does the following:
+
+        1. Gets all skills from the database.
+        2. Validates only one skill was returned.
+        3. Validates the name and confidence level match the create_one_skill fixture.
+        """
+        skills: Sequence[skill_model] = crud.get_skills(session=get_db_session)
         assert len(skills) == 1
         assert skills[0].skill_name == create_one_skill.skill_name
         assert skills[0].level_of_confidence == create_one_skill.level_of_confidence
@@ -148,7 +194,19 @@ class TestGetSkills:
         get_db_session: Session,
         create_two_skill: tuple[skill_base_schema, skill_base_schema],
     ) -> None:
-        skills: Sequence[skill_model] = crud.get_skills(get_db_session)
+        """Tests getting multiple skills from the database.
+
+        Args:
+            get_db_session: The database session fixture.
+            create_two_skill: Fixture that creates two sample skills.
+
+        This test does the following:
+
+        1. Gets all skills from the database.
+        2. Validates the number of skills matches the number created.
+        3. Validates the attributes of each returned skill matches the fixtures used to create them.
+        """
+        skills: Sequence[skill_model] = crud.get_skills(session=get_db_session)
         skill_1, skill_2 = create_two_skill
         assert len(skills) == MULTIPLE_SKILLS
         assert skills[0].skill_name == skill_1.skill_name
@@ -164,6 +222,21 @@ def test_get_skills(
     skill_2: skill_base_schema,
     number_of_skills: Literal[0, 1, 2],
 ) -> None:
+    """Tests getting all skills from the database.
+
+    Args:
+        get_db_session: The database session fixture.
+        skill_1: The first sample skill fixture.
+        skill_2: The second sample skill fixture.
+        number_of_skills: The number of skills to create.
+
+    This test does the following:
+
+    1. Optionally creates skill_1 and/or skill_2 based on number_of_skills.
+    2. Gets all skills from the database.
+    3. Validates the number of skills matches number_of_skills.
+    4. If skills were created, validates their attributes match the fixtures.
+    """
     skill_id_multiple_skills = 2
     if number_of_skills == 1:
         crud.create_skill(session=get_db_session, skill=skill_1)
@@ -189,6 +262,21 @@ def test_get_skills(
 def test_delete_skill(
     get_db_session: Session, create_one_skill: skill_model, skill_id: Literal[1, 2]
 ) -> None:
+    """Tests deleting a skill by ID.
+
+    Args:
+        get_db_session: The database session fixture.
+        create_one_skill: The fixture to create a sample skill.
+        skill_id: The ID of the skill to delete.
+
+    This test does the following:
+
+    1. Attempts to get a skill by the provided ID.
+    2. Deletes the skill if found.
+    3. Validates the skill no longer exists.
+    4. Checks that a UserWarning is raised if skill not found.
+    5. Validates the correct number of warnings were raised.
+    """
     with pytest.warns(
         expected_warning=UserWarning,
         match=f"The skill with id {skill_id} doesn't exists",
@@ -212,6 +300,22 @@ def test_delete_skill(
 def test_update_skill_name(
     get_db_session: Session, get_skill_id: int, skill_2: skill_base_schema
 ) -> None:
+    """Tests updating the name for a skill.
+
+    Args:
+        get_db_session: The database session fixture.
+        get_skill_id: The fixture that returns a skill ID.
+        skill_2: The fixture for a sample skill object.
+
+    This test does the following:
+
+    1. Gets a skill ID from the get_skill_id fixture.
+    2. Updates the name for that skill ID using the
+    name from skill_2.
+    3. Retrieves the updated skill from the database.
+    4. Validates the updated name matches skill_2.
+    5. Validates the skill ID matches the original.
+    """
     skill_id: int = get_skill_id
     crud.update_skill_name(
         session=get_db_session, skill_id=skill_id, new_name=skill_2.skill_name
@@ -227,6 +331,21 @@ def test_update_skill_name(
 def test_update_skill_level_of_confidence(
     get_db_session: Session, get_skill_id: int, skill_2: skill_base_schema
 ) -> None:
+    """Tests updating the level of confidence for a skill.
+
+    Args:
+        get_db_session: The database session fixture.
+        get_skill_id: The fixture that returns a skill ID.
+        skill_2: The fixture for a sample skill object.
+
+    This test does the following:
+
+    1. Gets a skill ID from the get_skill_id fixture.
+    2. Updates the level of confidence for that skill ID using the level from skill_2.
+    3. Retrieves the updated skill from the database.
+    4. Validates the updated level of confidence matches skill_2.
+    5. Validates the skill ID matches the original.
+    """
     skill_id: int = get_skill_id
     crud.update_skill_level_of_confidence(
         session=get_db_session,
