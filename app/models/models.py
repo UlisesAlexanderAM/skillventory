@@ -1,4 +1,4 @@
-"""Defines the SQLAlchemy models"""
+"""Defines the SQLAlchemy models."""
 
 import sqlalchemy
 from sqlalchemy import orm
@@ -10,18 +10,20 @@ skill_place_table = sqlalchemy.Table(
     "skill_place_table",
     config.Base.metadata,
     sqlalchemy.Column(
-        "skill_id", sqlalchemy.ForeignKey("skill.skill_id"), primary_key=True
+        "skill_id",
+        sqlalchemy.ForeignKey(column="skill.skill_id"),
+        primary_key=True,
     ),
     sqlalchemy.Column(
         "place_id",
-        sqlalchemy.ForeignKey("place_with_greater_interest.place_id"),
+        sqlalchemy.ForeignKey(column="place_with_greater_interest.place_id"),
         primary_key=True,
     ),
 )
 
 
 class Skill(config.Base):
-    """Model of the table skill"""
+    """Model of the table skill."""
 
     __tablename__: str = "skill"
 
@@ -38,7 +40,7 @@ class Skill(config.Base):
 
 
 class PlaceWithGreaterInterest(config.Base):
-    """Model of the table place_with_greater_interest"""
+    """Model of the table place_with_greater_interest."""
 
     __tablename__: str = "place_with_greater_interest"
 

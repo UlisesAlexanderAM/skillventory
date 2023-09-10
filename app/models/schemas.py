@@ -1,12 +1,12 @@
-"""Defines the pydantic models"""
+"""Defines the pydantic models."""
 
 import enum
 import pydantic
-from typing import Optional, TypeAlias
+from typing import Optional
 
 
 class LevelOfConfidence(enum.Enum):
-    """Enum of the level of confidence"""
+    """Enum of the level of confidence."""
 
     LEVEL_1 = "Debo empezar a aprender o desarrollar"
     LEVEL_2 = "Estoy aprendiendo o desarrollando"
@@ -14,7 +14,7 @@ class LevelOfConfidence(enum.Enum):
 
 
 class SkillBase(pydantic.BaseModel):
-    """Model of the skill/knowledge/competence"""
+    """Model of the skill/knowledge/competence."""
 
     skill_name: str
     level_of_confidence: LevelOfConfidence
@@ -23,7 +23,7 @@ class SkillBase(pydantic.BaseModel):
 
 
 class PlaceWithGreaterInterestBase(pydantic.BaseModel):
-    """Model of the place with greater interest"""
+    """Model of the place with greater interest."""
 
     place_name: str
     website_link: pydantic.HttpUrl
@@ -40,9 +40,6 @@ class Skill(SkillBase):
 
 class PlaceWithGreaterInterest(PlaceWithGreaterInterestBase):
     place_id: int
-    skilss: list[SkillBase]
+    skills: list[SkillBase]
 
     model_config = pydantic.ConfigDict(from_attributes=True)
-
-skill_base_schema: TypeAlias = SkillBase
-skill_schema: TypeAlias = Skill

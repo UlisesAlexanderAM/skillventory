@@ -1,16 +1,16 @@
 """Tests for CRUD operations on skills.
 
-This module contains tests for CRUD (create, read, update, delete) 
+This module contains tests for CRUD (create, read, update, delete)
 operations on skills using a test database session fixture.
 
 Fixtures:
 - get_db_session: Module scoped session fixture.
-- setup_db: Function scoped setup/teardown fixture.  
+- setup_db: Function scoped setup/teardown fixture.
 - skill_factory: Session scoped skill factory fixture.
 - skill_1: Session scoped fixture for a sample skill.
 - skill_2: Session scoped fixture for another sample skill.
 
-The tests will execute CRUD operations on skills using the fixtures 
+The tests will execute CRUD operations on skills using the fixtures
 to test the CRUD functions and validate the results.
 """
 
@@ -70,7 +70,7 @@ def test_get_skill_by_name(
     skill_name: str,
     expected_warning: Any,
 ) -> None:
-    """Tests get_skill_by_name
+    """Tests get_skill_by_name.
 
     Args:
         get_db_session: Database session fixture
@@ -186,7 +186,7 @@ def test_get_skills(
 @pytest.mark.parametrize("skill_id", [1, 2])
 def test_delete_skill(
     get_db_session: Session, create_one_skill: skill_model, skill_id: Literal[1, 2]
-):
+) -> None:
     with pytest.warns(
         expected_warning=UserWarning,
         match=f"The skill with id {skill_id} doesn't exists",

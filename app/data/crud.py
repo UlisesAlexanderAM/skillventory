@@ -1,4 +1,4 @@
-"""CRUD functions"""
+"""CRUD functions."""
 import sqlite3
 import warnings
 from collections.abc import Sequence

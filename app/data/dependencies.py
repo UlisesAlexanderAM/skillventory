@@ -1,4 +1,4 @@
-"""Defines the dependencies used"""
+"""Defines the dependencies used."""
 from sqlalchemy.orm import Session
 from collections.abc import Iterator
 from app.database import config
