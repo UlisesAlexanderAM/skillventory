@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from app.data import crud
 from app.models.type_aliases import skill_base_schema, skill_model
 
+MULTIPLE_SKILLS = 2
 
 
 @pytest.mark.parametrize("skill_id,expected_warning", [(1, None), (2, UserWarning)])
@@ -149,7 +150,7 @@ class TestGetSkills:
     ) -> None:
         skills: Sequence[skill_model] = crud.get_skills(get_db_session)
         skill_1, skill_2 = create_two_skill
-        assert len(skills) == 2
+        assert len(skills) == MULTIPLE_SKILLS
         assert skills[0].skill_name == skill_1.skill_name
         assert skills[0].level_of_confidence == skill_1.level_of_confidence
         assert skills[1].skill_name == skill_2.skill_name
@@ -163,9 +164,10 @@ def test_get_skills(
     skill_2: skill_base_schema,
     number_of_skills: Literal[0, 1, 2],
 ) -> None:
+    skill_id_multiple_skills = 2
     if number_of_skills == 1:
         crud.create_skill(session=get_db_session, skill=skill_1)
-    elif number_of_skills == 2:
+    elif number_of_skills == MULTIPLE_SKILLS:
         crud.create_skill(session=get_db_session, skill=skill_1)
         crud.create_skill(session=get_db_session, skill=skill_2)
     skills: Sequence[skill_model] = crud.get_skills(session=get_db_session)
@@ -174,13 +176,13 @@ def test_get_skills(
         assert skills[0].skill_name == skill_1.skill_name
         assert skills[0].level_of_confidence == skill_1.level_of_confidence
         assert skills[0].skill_id == 1
-    elif number_of_skills == 2:
+    elif number_of_skills == MULTIPLE_SKILLS:
         assert skills[0].skill_name == skill_1.skill_name
         assert skills[0].level_of_confidence == skill_1.level_of_confidence
         assert skills[0].skill_id == 1
         assert skills[1].skill_name == skill_2.skill_name
         assert skills[1].level_of_confidence == skill_2.level_of_confidence
-        assert skills[1].skill_id == 2
+        assert skills[1].skill_id == skill_id_multiple_skills
 
 
 @pytest.mark.parametrize("skill_id", [1, 2])
