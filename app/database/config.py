@@ -1,4 +1,4 @@
-"""Database configuration"""
+"""Database configuration."""
 
 import sqlalchemy
 import pydantic_settings
@@ -6,8 +6,17 @@ from sqlalchemy import orm, pool
 
 
 class DBSettings(pydantic_settings.BaseSettings):
-    """Pydantic model to store the sqlite url.
-    If the environment variable is not set uses 'sqlite:///./database.db'"""
+    """Database settings model.
+
+    Attributes:
+        SQLITE_URL: The URL for the SQLite database. Default is sqlite:///./database.db
+        model_config: Configuration for Pydantic models loaded from .env file.
+
+    This class defines the database settings by subclassing BaseSettings.
+    The SQLITE_URL provides the database URL.
+
+    The model_config tells pydantic to use ".env" as an env file to load settings from.
+    """
 
     SQLITE_URL: str = "sqlite:///./database.db"
 
@@ -26,6 +35,19 @@ Base = orm.declarative_base()
 
 
 class DBTestingSettings(pydantic_settings.BaseSettings):
+    """Database testing settings model.
+
+    Attributes:
+        SQLITE_URL: The URL for the SQLite test database. Default is sqlite://
+        which is an in-memory database.
+        model_config: Configuration for Pydantic models loaded from .env file.
+
+    This class defines the test database settings by subclassing BaseSettings.
+    The SQLITE_URL provides the test database URL.
+
+    The model_config tells pydantic to use ".env" as an env file to load settings from
+    """
+
     SQLITE_URL: str = "sqlite://"
 
     model_config = pydantic_settings.SettingsConfigDict(env_file=".env")
