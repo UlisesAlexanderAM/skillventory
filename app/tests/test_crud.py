@@ -237,25 +237,18 @@ def test_get_skills(
     3. Validates the number of skills matches number_of_skills.
     4. If skills were created, validates their attributes match the fixtures.
     """
-    skill_id_multiple_skills = 2
-    if number_of_skills == 1:
-        crud.create_skill(session=get_db_session, skill=skill_1)
-    elif number_of_skills == MULTIPLE_SKILLS:
-        crud.create_skill(session=get_db_session, skill=skill_1)
-        crud.create_skill(session=get_db_session, skill=skill_2)
-    skills: Sequence[skill_model] = crud.get_skills(session=get_db_session)
-    assert len(skills) == number_of_skills
-    if number_of_skills == 1:
-        assert skills[0].skill_name == skill_1.skill_name
-        assert skills[0].level_of_confidence == skill_1.level_of_confidence
-        assert skills[0].skill_id == 1
-    elif number_of_skills == MULTIPLE_SKILLS:
-        assert skills[0].skill_name == skill_1.skill_name
-        assert skills[0].level_of_confidence == skill_1.level_of_confidence
-        assert skills[0].skill_id == 1
-        assert skills[1].skill_name == skill_2.skill_name
-        assert skills[1].level_of_confidence == skill_2.level_of_confidence
-        assert skills[1].skill_id == skill_id_multiple_skills
+    skills: list[skill_base_schema] = [skill_1, skill_2]
+    skills_wanted: list[skill_base_schema] = []
+    for _ in range(number_of_skills):
+        crud.create_skill(session=get_db_session, skill=skills[_])
+        skills_wanted.append(skills[_])
+    skills_db: Sequence[skill_model] = crud.get_skills(session=get_db_session)
+
+    assert len(skills_db) == number_of_skills
+
+    for skill_wanted, skill_db in zip(skills_wanted, skills_db, strict=True):
+        assert skill_db.skill_name == skill_wanted.skill_name
+        assert skill_db.level_of_confidence == skill_wanted.level_of_confidence
 
 
 @pytest.mark.parametrize("skill_id", [1, 2])
