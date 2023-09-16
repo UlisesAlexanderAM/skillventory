@@ -23,39 +23,46 @@ So I decided to create a web app to solve those problems and change a little the
   As a person interested in keeping track of my skills/knowledge/competences in a personal inventory, User, I want to register a new skill/knowledge/competence, so I can keep track of it.
 
   Acceptance criteria:
-  - [ ] I can register a new skill/knowledge/competence
-  - [ ] The skill/knowledge/competence has a name
-  - [ ] The skill/knowledge/competence has a level of confidence
-    - [ ] The level of confidence is one of the following:
+  - [x] I can register a new skill/knowledge/competence
+  - [x] The skill/knowledge/competence has a name
+  - [x] The skill/knowledge/competence has a level of confidence
+    - [x] The level of confidence is one of the following:
       - "Debo empezar a aprender o desarrollar (I needed to start learning or developing it)"
       - "Estoy aprendiendo o desarrollando (I'm learning or developing it"
       - "Tengo confianza (I'm confident)"
-  - [ ] The skill/knowledge/competence has a list of places with greater interest
+  - [ ] The skill/knowledge/competence has a list of domains (Optional)
+  - [ ] The skill/knowledge/competence has a list of places with greater interest (Optional)
 
 - [ ] 2 - Retrieve a skill/knowledge/competence
 
   As a user, I want to retrieve a skill/knowledge/competence, so I can show or update it.
 
   Acceptance criteria:
-  - [ ] I can retrieve a skill/knowledge/competence
+  - [x] I can retrieve a skill/knowledge/competence
+    - [x] I can retrieve a skill/knowledge/competence by name
+    - [x] I can retrieve a skill/knowledge/competence by id
+    - [ ] I can retrieve a skill/knowledge/competence by domain
 
-- [ ] 3 - Retrieve all skills/knowledge/competences
+- [x] 3 - Retrieve all skills/knowledge/competences
 
   As a user, I want to retrieve all skills/knowledge/competences, so I can show them.
 
   Acceptance criteria:
-  - [ ] I can retrieve all skills/knowledge/competences
+  - [x] I can retrieve all skills/knowledge/competences
 
 - [ ] 4 - Update a skill/knowledge/competence
 
   As a user, I want to update a skill/knowledge/competence, to keep it updated.
 
   Acceptance criteria:
-  - [ ] I can update a skill/knowledge/competence name
-  - [ ] I can update a skill/knowledge/competence level of confidence
+  - [x] I can update a skill/knowledge/competence name
+  - [x] I can update a skill/knowledge/competence level of confidence
   - [ ] I can update a skill/knowledge/competence places with greater interest
     - [ ] I can add a place with greater interest to a skill/knowledge/competence
     - [ ] I can remove a place with greater interest from a skill/knowledge/competence
+  - [ ] I can update a skill/knowledge/competence domain
+    - [ ] I can add a domain to a skill/knowledge/competence
+    - [ ] I can remove a domain from a skill/knowledge/competence
 
 - [ ] 5 - Register a new place with greater interest
 
@@ -91,3 +98,34 @@ So I decided to create a web app to solve those problems and change a little the
   - [ ] I can update a place with greater interest link to their website
   - [ ] I can update a place with greater interest link to their job positions page
   - [ ] I can update a place with greater interest link to their LinkedIn page
+
+- [ ] 9 - Register a new domain
+
+  As a user, I want to register a new domain, so I can keep track of it.
+
+  Acceptance criteria:
+  - [ ] I can register a new domain
+    - [ ] The domain has a name
+
+- [ ] 10 - Retrieve a domain
+
+  As a user, I want to retrieve a domain, so I can show or update it.
+
+  Acceptance criteria:
+  - [ ] I can retrieve a domain
+    - [ ] I can retrieve a domain by name
+    - [ ] I can retrieve a domain by id
+
+- [ ] 11 - I can retrieve all domains
+
+  As a user, I want to retrieve all domains, so I can show them.
+
+  Acceptance criteria:
+  - [ ] I can retrieve all domains
+
+- [ ] 12 - Update a domain
+
+  As a user, I want to update a domain.
+
+  Acceptance criteria:
+  - [ ] I can update a domain name
