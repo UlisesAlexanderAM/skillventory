@@ -16,6 +16,42 @@ But I stumbled upon a problem, I wanted to know which skills appeared in more pl
 
 So I decided to create a web app to solve those problems and change a little the purpose and implementation of the personal inventory. Below I'll write the user stories that I want to implement, diagrams and mockups.
 
+## Diagrams
+
+### ERD (Entity Relationship Diagram)
+
+```mermaid
+erDiagram
+    skill only one -- zero or more skill_place: has    
+    place_with_greater_interest only one -- zero or more skill_place: has
+    domain only one -- zero or more skill_domains: has
+    skill only one -- zero or more skill_domains: has
+    place_with_greater_interest {
+      int id PK
+      string name UK
+      string website_link
+      string job_posting_link
+      string linkedin_link
+    }
+    skill {
+      int id PK
+      string name UK
+      enum level_of_confidence
+    }
+    domain {
+      int id PK
+      string name UK
+    }
+    skill_place{
+      int skill_id PK,FK
+      int place_with_greater_interest_id PK,FK
+    }
+    skill_domains {
+      int skill_id PK,FK
+      int domain_id PK,FK
+    }
+```
+
 ## User Stories
 
 - [ ] 1 - Register a new skill/knowledge/competence
