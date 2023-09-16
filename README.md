@@ -22,7 +22,7 @@ So I decided to create a web app to solve those problems and change a little the
 
 ```mermaid
 erDiagram
-    skill only one -- zero or more skill_place: has    
+    skill only one -- zero or more skill_place: has
     place_with_greater_interest only one -- zero or more skill_place: has
     domain only one -- zero or more skill_domains: has
     skill only one -- zero or more skill_domains: has
@@ -59,6 +59,7 @@ erDiagram
   As a person interested in keeping track of my skills/knowledge/competences in a personal inventory, User, I want to register a new skill/knowledge/competence, so I can keep track of it.
 
   Acceptance criteria:
+
   - [x] I can register a new skill/knowledge/competence
   - [x] The skill/knowledge/competence has a name
   - [x] The skill/knowledge/competence has a level of confidence
@@ -74,6 +75,7 @@ erDiagram
   As a user, I want to retrieve a skill/knowledge/competence, so I can show or update it.
 
   Acceptance criteria:
+
   - [x] I can retrieve a skill/knowledge/competence
     - [x] I can retrieve a skill/knowledge/competence by name
     - [x] I can retrieve a skill/knowledge/competence by id
@@ -84,6 +86,7 @@ erDiagram
   As a user, I want to retrieve all skills/knowledge/competences, so I can show them.
 
   Acceptance criteria:
+
   - [x] I can retrieve all skills/knowledge/competences
 
 - [ ] 4 - Update a skill/knowledge/competence
@@ -91,6 +94,7 @@ erDiagram
   As a user, I want to update a skill/knowledge/competence, to keep it updated.
 
   Acceptance criteria:
+
   - [x] I can update a skill/knowledge/competence name
   - [x] I can update a skill/knowledge/competence level of confidence
   - [ ] I can update a skill/knowledge/competence places with greater interest
@@ -105,6 +109,7 @@ erDiagram
   As a user, I want to register a new place with greater interest, so I can keep track of it.
 
   Acceptance criteria:
+
   - [ ] I can register a new place with greater interest
   - [ ] The place with greater interest has a name
   - [ ] The place with greater interest has a link to their website
@@ -112,10 +117,11 @@ erDiagram
   - [ ] The place with greater interest has a link to their LinkedIn page (Optional)
 
 - [ ] 6 - Retrieve a place with greater interest
-  
+
   As a user, I want to retrieve a place with greater interest, so I can show or update it.
-  
+
   Acceptance criteria:
+
   - [ ] I can retrieve a place with greater interest
 
 - [ ] 7 - Retrieve all places with greater interest
@@ -123,13 +129,15 @@ erDiagram
   As a user, I want to retrieve all places with greater interest, so I can show them.
 
   Acceptance criteria:
+
   - [ ] I can retrieve all places with greater interest
 
 - [ ] 8 - Update a place with greater interest
-  
+
   As a user, I want to update a place with greater interest, so I can keep it updated.
-  
+
   Acceptance criteria:
+
   - [ ] I can update a place with greater interest name
   - [ ] I can update a place with greater interest link to their website
   - [ ] I can update a place with greater interest link to their job positions page
@@ -140,6 +148,7 @@ erDiagram
   As a user, I want to register a new domain, so I can keep track of it.
 
   Acceptance criteria:
+
   - [ ] I can register a new domain
     - [ ] The domain has a name
 
@@ -148,6 +157,7 @@ erDiagram
   As a user, I want to retrieve a domain, so I can show or update it.
 
   Acceptance criteria:
+
   - [ ] I can retrieve a domain
     - [ ] I can retrieve a domain by name
     - [ ] I can retrieve a domain by id
@@ -157,6 +167,7 @@ erDiagram
   As a user, I want to retrieve all domains, so I can show them.
 
   Acceptance criteria:
+
   - [ ] I can retrieve all domains
 
 - [ ] 12 - Update a domain
@@ -164,4 +175,29 @@ erDiagram
   As a user, I want to update a domain.
 
   Acceptance criteria:
+
   - [ ] I can update a domain name
+
+- [ ] 13 - Delete a domain
+
+  As a user, I want to delete a domain, so I can remove it from my list.
+
+  Acceptance criteria:
+
+  - [ ] I can delete a domain
+
+- [ ] 14 - Delete a skill/knowledge/competence
+
+  As a user, I want to delete a skill/knowledge/competence, so I can remove it from my list.
+
+  Acceptance criteria:
+
+  - [ ] I can delete a skill
+
+- [ ] 15 - Delete a place with greater interest
+
+  As a user, I want to delete a domain, so I can remove it from my list.
+
+  Acceptance criteria:
+
+  - [ ] I can delete a place with greater interest
