@@ -69,6 +69,7 @@ erDiagram
       - "Tengo confianza (I'm confident)"
   - [ ] The skill/knowledge/competence has a list of domains (Optional)
   - [ ] The skill/knowledge/competence has a list of places with greater interest (Optional)
+  - [ ] I can register a new skill/knowledge/competence using an HTTP client
 
 - [ ] 2 - Retrieve a skill/knowledge/competence
 
@@ -80,6 +81,7 @@ erDiagram
     - [x] I can retrieve a skill/knowledge/competence by name
     - [x] I can retrieve a skill/knowledge/competence by id
     - [ ] I can retrieve a skill/knowledge/competence by domain
+  - [ ] I can retrieve a skill/knowledge/competence using an HTTP client
 
 - [x] 3 - Retrieve all skills/knowledge/competences
 
@@ -88,6 +90,7 @@ erDiagram
   Acceptance criteria:
 
   - [x] I can retrieve all skills/knowledge/competences
+  - [ ] I can retrieve all skills/knowledge/competences using an HTTP client
 
 - [ ] 4 - Update a skill/knowledge/competence
 
@@ -103,6 +106,7 @@ erDiagram
   - [ ] I can update a skill/knowledge/competence domain
     - [ ] I can add a domain to a skill/knowledge/competence
     - [ ] I can remove a domain from a skill/knowledge/competence
+  - [ ] I can update a skill/knowledge/competence using an HTTP client
 
 - [ ] 5 - Register a new place with greater interest
 
@@ -192,7 +196,8 @@ erDiagram
 
   Acceptance criteria:
 
-  - [ ] I can delete a skill
+  - [x] I can delete a skill/knowledge/competence
+  - [ ] I can delete a skill/knowledge/competence using an HTTP client
 
 - [ ] 15 - Delete a place with greater interest
 
