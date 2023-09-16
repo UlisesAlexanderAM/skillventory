@@ -22,6 +22,7 @@ ruff = "^0.0.282"
 mypy = "^1.4.1"
 pytest = "^7.4.0"
 httpx = "^0.24.1"
+bandit = {extras = ["toml"], version = "^1.7.5"}
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
