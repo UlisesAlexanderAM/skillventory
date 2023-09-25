@@ -40,3 +40,19 @@ def post_skill(
     raise fa.HTTPException(
         status_code=status.HTTP_409_CONFLICT, detail="Skill already added"
     )
+
+
+@router.get(
+    "/id/{skill_id}", status_code=status.HTTP_200_OK, response_model=skill_schema
+)
+def get_skill_by_id(
+    skill_id: Annotated[int, fa.Path(title="The ID of the skill to get")],
+    session: Annotated[Session, fa.Depends(deps.get_db_session)],
+):
+    skill_db = crud.get_skill_by_id(session=session, skill_id=skill_id)
+    if skill_db is None:
+        raise fa.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Skill with id {skill_id} not found",
+        )
+    return skill_db
