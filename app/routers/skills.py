@@ -22,3 +22,16 @@ def get_skills(
     session: Annotated[Session, fa.Depends(deps.get_db_session)],
 ) -> Sequence[skill_model]:
     return crud.get_skills(session=session)
+
+
+@router.post("/", status_code=status.HTTP_201_CREATED, response_class=JSONResponse)
+def post_skill(
+    skill: Annotated[skill_base_schema, fa.Body(description="Skill to add to the DB.")],
+    session: Annotated[Session, fa.Depends(deps.get_db_session)],
+):
+    if not crud.get_skill_by_name(session=session, skill_name=skill.skill_name):
+        crud.create_skill(session=session, skill=skill)
+        return {"message": "Skill added successfully"}
+    raise fa.HTTPException(
+        status_code=status.HTTP_409_CONFLICT, detail="Skill already added"
+    )
