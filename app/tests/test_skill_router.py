@@ -11,6 +11,19 @@ client = testclient.TestClient(app=main.app)
 
 
 @pytest.mark.usefixtures("override_get_db_session")
+@pytest.mark.parametrize(
+    "skill_id,expected_status_code",
+    [(1, status.HTTP_200_OK), (2, status.HTTP_404_NOT_FOUND)],
+)
+def test_get_skill_by_id(
+    skill_id: int, expected_status_code: int, skills_json: Sequence[dict[str, str]]
+):
+    client.post("/skills", json=skills_json[0])
+    response: Response = client.get(f"skills/id/{skill_id}")
+
+    assert response.status_code == expected_status_code
+
+
 @pytest.mark.parametrize("num_skills", [0, 1, 2])
 def test_get_skills(num_skills: int, skills_json: Sequence[dict[str, str]]) -> None:
     for _ in range(num_skills):
