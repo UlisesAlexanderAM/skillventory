@@ -24,7 +24,12 @@ def get_skills(
     return crud.get_skills(session=session)
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_class=JSONResponse)
+@router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    responses={409: {"description": "Conflicting request"}},
+    response_class=JSONResponse,
+)
 def post_skill(
     skill: Annotated[skill_base_schema, fa.Body(description="Skill to add to the DB.")],
     session: Annotated[Session, fa.Depends(deps.get_db_session)],

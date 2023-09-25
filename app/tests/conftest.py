@@ -17,7 +17,7 @@ The fixtures handle setup/teardown of the database for each test function
 and provide reusable objects for tests.
 """
 
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Sequence
 from typing import Any
 
 import pytest
@@ -153,7 +153,9 @@ def skill_2(
 
 
 @pytest.fixture(scope="session")
-def skills_json(skill_1: skill_base_schema, skill_2: skill_base_schema):
+def skills_json(
+    skill_1: skill_base_schema, skill_2: skill_base_schema
+) -> Sequence[dict[str, str]]:
     return [
         {
             "skill_name": skill_1.skill_name,
