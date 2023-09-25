@@ -23,7 +23,8 @@ from typing import Any
 import pytest
 from sqlalchemy.orm import Session
 
-from app.data import crud
+from app import main
+from app.data import crud, dependencies
 from app.database import config
 from app.models import schemas
 from app.models.type_aliases import skill_base_schema, skill_model, level_of_confidence
@@ -44,6 +45,18 @@ def get_db_session() -> Iterator[Session]:
         yield db
     finally:
         db.close()
+
+
+@pytest.fixture(scope="function")
+def override_get_db_session() -> Any:
+    def get_db_session():
+        db: Session = config.TestLocalSession()
+        try:
+            yield db
+        finally:
+            db.close()
+
+    main.app.dependency_overrides[dependencies.get_db_session] = get_db_session
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -137,6 +150,20 @@ def skill_2(
     the created skill_2 object.
     """
     yield skill_factory("typescript", schemas.LevelOfConfidence.LEVEL_1)
+
+
+@pytest.fixture(scope="session")
+def skills_json(skill_1: skill_base_schema, skill_2: skill_base_schema):
+    return [
+        {
+            "skill_name": skill_1.skill_name,
+            "level_of_confidence": skill_1.level_of_confidence.value,
+        },
+        {
+            "skill_name": skill_2.skill_name,
+            "level_of_confidence": skill_2.level_of_confidence.value,
+        },
+    ]
 
 
 @pytest.fixture(scope="function")
