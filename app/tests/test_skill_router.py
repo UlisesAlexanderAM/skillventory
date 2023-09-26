@@ -5,7 +5,6 @@ from fastapi import status, testclient
 from httpx import Response
 
 from app import main
-from app.models.type_aliases import skill_base_schema
 
 client = testclient.TestClient(app=main.app)
 
@@ -45,16 +44,10 @@ def test_post_skill(
     expected_status_code: int,
     expected_json: Sequence[dict[str, str]],
     num_skills: int,
-    skill_1: skill_base_schema,
+    skills_json: Sequence[dict[str, str]],
 ) -> None:
     for _ in range(num_skills):
-        response = client.post(
-            "/skills",
-            json={
-                "skill_name": skill_1.skill_name,
-                "level_of_confidence": skill_1.level_of_confidence.value,
-            },
-        )
+        response = client.post("/skills", json=skills_json[0])
 
     assert response.status_code == expected_status_code
     assert response.json() == expected_json
