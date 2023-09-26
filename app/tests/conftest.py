@@ -21,7 +21,9 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import Any
 
 import pytest
+from _pytest import logging
 from sqlalchemy.orm import Session
+from loguru import logger
 
 from app import main
 from app.data import crud, dependencies
@@ -239,3 +241,24 @@ def get_skill_id(
     )
     if _skill is not None:
         yield _skill.skill_id
+
+
+@pytest.fixture
+def reportlog(pytestconfig):
+    logging_plugin = pytestconfig.pluginmanager.getplugin("logging-plugin")
+    handler_id = logger.add(logging_plugin.report_handler, format="{message}")
+    yield
+    logger.remove(handler_id)
+
+
+@pytest.fixture
+def caplog(caplog: logging.LogCaptureFixture):
+    handler_id = logger.add(
+        caplog.handler,
+        format="{message}",
+        level=0,
+        filter=lambda record: record["level"].no >= caplog.handler.level,
+        enqueue=False,  # Set to 'True' if your test is spawning child processes.
+    )
+    yield caplog
+    logger.remove(handler_id)
