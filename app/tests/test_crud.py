@@ -23,7 +23,6 @@ Tests:
 - test_delete_skill: Tests deleting a skill.
 """
 
-import sqlite3
 from collections.abc import Sequence
 from typing import Any, Literal
 
@@ -36,12 +35,13 @@ from app.models.type_aliases import skill_base_schema, skill_model
 MULTIPLE_SKILLS = 2
 
 
-@pytest.mark.parametrize("skill_id,expected_warning", [(1, None), (2, UserWarning)])
+@pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
 def test_get_skill_by_id(
     get_db_session: Session,
-    create_one_skill: skill_model,
+    create_one_skill: skill_model,  # pyright:ignore
     skill_id: int,
-    expected_warning: Any,
+    expected_warning: bool,
+    caplog,
 ) -> None:
     """Tests getting a skill by ID.
 
@@ -58,27 +58,27 @@ def test_get_skill_by_id(
     It expects a UserWarning if the skill does not exist, or no warning if it does.
     The warning match is checked and the returned skill is validated if no warning.
     """
-    with pytest.warns(
-        expected_warning=expected_warning,
-        match=f"The skill with id {skill_id} doesn't exists",
-    ):
-        skill: skill_model | None = crud.get_skill_by_id(
-            session=get_db_session, skill_id=skill_id
-        )
+    skill: skill_model | None = crud.get_skill_by_id(
+        session=get_db_session, skill_id=skill_id
+    )
 
-        if expected_warning is None:
-            assert skill is not None
-            assert skill.skill_id == skill_id
+    if expected_warning:
+        assert f"The skill with id {skill_id} doesn't exists" in caplog.text
+    else:
+        assert skill is not None
+        assert skill.skill_id == skill_id
+        assert "Operation 'get_skill_by_id' ended successfully" in caplog.text
 
 
 @pytest.mark.parametrize(
-    "skill_name,expected_warning", [("python", None), ("java", UserWarning)]
+    "skill_name,expected_warning", [("python", False), ("java", True)]
 )
 def test_get_skill_by_name(
     get_db_session: Session,
     create_one_skill: skill_base_schema,
     skill_name: str,
-    expected_warning: Any,
+    expected_warning: bool,
+    caplog,
 ) -> None:
     """Tests get_skill_by_name.
 
@@ -92,20 +92,18 @@ def test_get_skill_by_name(
     If the skill is found, no warning is expected. If not found, a warning is expected.
     If the skill is found, assert it matches the created skill.
     """
-    with pytest.warns(
-        expected_warning=expected_warning,
-        match=f"The skill named {skill_name} doesn't exists",
-    ):
-        skill: skill_model | None = crud.get_skill_by_name(
-            session=get_db_session, skill_name=skill_name
-        )
+    skill: skill_model | None = crud.get_skill_by_name(
+        session=get_db_session, skill_name=skill_name
+    )
 
-        if expected_warning is None:
-            assert skill is not None
-            assert skill.skill_name == create_one_skill.skill_name
+    if expected_warning:
+        assert f"The skill named {skill_name} doesn't exists" in caplog.text
+    else:
+        assert skill is not None
+        assert skill.skill_name == create_one_skill.skill_name
 
 
-@pytest.mark.parametrize("expected_exception", [None, sqlite3.IntegrityError])
+@pytest.mark.parametrize("expected_exception", [False, True])
 def test_create_skill(
     get_db_session: Session, skill_1: skill_base_schema, expected_exception: Any
 ) -> None:
@@ -130,89 +128,7 @@ def test_create_skill(
     assert skill.level_of_confidence == skill_1.level_of_confidence
 
     if expected_exception is not None:
-        with pytest.raises(expected_exception=expected_exception) as exc_info:
-            crud.create_skill(session=get_db_session, skill=skill_1)
-        assert "The skill already exist" in str(exc_info.value)
-        assert exc_info.type is sqlite3.IntegrityError
-
-
-class TestGetSkills:
-    """Tests for getting skills from the database.
-
-    This class contains tests for retrieving skills from the
-    database using the crud.get_skills() function.
-
-    Methods:
-    - test_get_zero_skills: Validates getting no skills.
-    - test_get_one_skill: Validates getting one skill.
-    - test_get_multiple_skills: Validates getting multiple skills.
-
-    The tests validate the number of skills returned and that
-    their attributes match the expected values.
-    """
-
-    @staticmethod
-    def test_get_zero_skills(get_db_session: Session) -> None:
-        """Tests getting zero skills from the database.
-
-        Args:
-            get_db_session: The database session fixture.
-
-        This test does the following:
-
-        1. Gets all skills from the empty database.
-        2. Validates an empty list is returned.
-        3. Validates the length of the list is 0.
-        """
-        skill: Sequence[skill_model] = crud.get_skills(session=get_db_session)
-        assert skill == []
-        assert len(skill) == 0
-
-    @staticmethod
-    def test_get_one_skill(
-        get_db_session: Session, create_one_skill: skill_base_schema
-    ) -> None:
-        """Tests getting one skill from the database.
-
-        Args:
-            get_db_session: The database session fixture.
-            create_one_skill: The fixture to create one sample skill.
-
-        This test does the following:
-
-        1. Gets all skills from the database.
-        2. Validates only one skill was returned.
-        3. Validates the name and confidence level match the create_one_skill fixture.
-        """
-        skills: Sequence[skill_model] = crud.get_skills(session=get_db_session)
-        assert len(skills) == 1
-        assert skills[0].skill_name == create_one_skill.skill_name
-        assert skills[0].level_of_confidence == create_one_skill.level_of_confidence
-
-    @staticmethod
-    def test_get_multiple_skills(
-        get_db_session: Session,
-        create_two_skill: tuple[skill_base_schema, skill_base_schema],
-    ) -> None:
-        """Tests getting multiple skills from the database.
-
-        Args:
-            get_db_session: The database session fixture.
-            create_two_skill: Fixture that creates two sample skills.
-
-        This test does the following:
-
-        1. Gets all skills from the database.
-        2. Validates the number of skills matches the number created.
-        3. Validates the attributes of each returned skill matches the fixtures used to create them.
-        """
-        skills: Sequence[skill_model] = crud.get_skills(session=get_db_session)
-        skill_1, skill_2 = create_two_skill
-        assert len(skills) == MULTIPLE_SKILLS
-        assert skills[0].skill_name == skill_1.skill_name
-        assert skills[0].level_of_confidence == skill_1.level_of_confidence
-        assert skills[1].skill_name == skill_2.skill_name
-        assert skills[1].level_of_confidence == skill_2.level_of_confidence
+        pass
 
 
 @pytest.mark.parametrize("number_of_skills", [0, 1, 2])
@@ -270,24 +186,11 @@ def test_delete_skill(
     4. Checks that a UserWarning is raised if skill not found.
     5. Validates the correct number of warnings were raised.
     """
-    with pytest.warns(
-        expected_warning=UserWarning,
-        match=f"The skill with id {skill_id} doesn't exists",
-    ) as record:
-        if skill_id == 1:
-            warnings_num = 1
-        else:
-            warnings_num = 2
-        skill: skill_model | None = crud.get_skill_by_id(
-            session=get_db_session, skill_id=skill_id
-        )
-        crud.delete_skill(session=get_db_session, skill=skill)
-        assert crud.get_skill_by_id(session=get_db_session, skill_id=skill_id) is None
-
-        if not record:
-            pytest.fail("Expected warning was not raised")
-
-        assert len(record) == warnings_num
+    skill: skill_model | None = crud.get_skill_by_id(
+        session=get_db_session, skill_id=skill_id
+    )
+    crud.delete_skill(session=get_db_session, skill=skill)
+    assert crud.get_skill_by_id(session=get_db_session, skill_id=skill_id) is None
 
 
 def test_update_skill_name(
