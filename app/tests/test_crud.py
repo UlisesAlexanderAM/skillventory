@@ -24,7 +24,7 @@ Tests:
 """
 
 from collections.abc import Sequence
-from typing import Any, Literal
+from typing import Literal
 
 import pytest
 from sqlalchemy.orm import Session
@@ -75,7 +75,7 @@ def test_get_skill_by_id(
 )
 def test_get_skill_by_name(
     get_db_session: Session,
-    create_one_skill: skill_base_schema,
+    create_one_skill: skill_base_schema,  # pyright:ignore
     skill_name: str,
     expected_warning: bool,
     caplog,
@@ -105,7 +105,10 @@ def test_get_skill_by_name(
 
 @pytest.mark.parametrize("expected_exception", [False, True])
 def test_create_skill(
-    get_db_session: Session, skill_1: skill_base_schema, expected_exception: Any
+    get_db_session: Session,
+    skill_1: skill_base_schema,
+    expected_exception: bool,
+    caplog,
 ) -> None:
     """Tests creating a skill.
 
@@ -127,8 +130,9 @@ def test_create_skill(
     assert skill.skill_name == skill_1.skill_name
     assert skill.level_of_confidence == skill_1.level_of_confidence
 
-    if expected_exception is not None:
-        pass
+    if expected_exception:
+        crud.create_skill(session=get_db_session, skill=skill_1)
+        assert f"Skill {skill.skill_name} already exist" in caplog.text
 
 
 @pytest.mark.parametrize("number_of_skills", [0, 1, 2])
@@ -193,8 +197,14 @@ def test_delete_skill(
     assert crud.get_skill_by_id(session=get_db_session, skill_id=skill_id) is None
 
 
+@pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
 def test_update_skill_name(
-    get_db_session: Session, get_skill_id: int, skill_2: skill_base_schema
+    get_db_session: Session,
+    create_one_skill: skill_model,
+    skill_2: skill_base_schema,
+    skill_id: Literal[1, 2],
+    expected_warning: bool,
+    caplog,
 ) -> None:
     """Tests updating the name for a skill.
 
@@ -212,20 +222,28 @@ def test_update_skill_name(
     4. Validates the updated name matches skill_2.
     5. Validates the skill ID matches the original.
     """
-    skill_id: int = get_skill_id
     crud.update_skill_name(
         session=get_db_session, skill_id=skill_id, new_name=skill_2.skill_name
     )
     skill_updated: skill_model | None = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
-    assert skill_updated is not None
-    assert skill_updated.skill_name == skill_2.skill_name
-    assert skill_updated.skill_id == skill_id
+    if expected_warning:
+        assert f"The skill with id {skill_id} doesn't exist" in caplog.text
+    else:
+        assert skill_updated is not None
+        assert skill_updated.skill_id == skill_id
+        assert skill_updated.skill_name == skill_2.skill_name
 
 
+@pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
 def test_update_skill_level_of_confidence(
-    get_db_session: Session, get_skill_id: int, skill_2: skill_base_schema
+    get_db_session: Session,
+    create_one_skill: skill_model,
+    skill_2: skill_base_schema,
+    skill_id: int,
+    expected_warning: bool,
+    caplog,
 ) -> None:
     """Tests updating the level of confidence for a skill.
 
@@ -242,7 +260,6 @@ def test_update_skill_level_of_confidence(
     4. Validates the updated level of confidence matches skill_2.
     5. Validates the skill ID matches the original.
     """
-    skill_id: int = get_skill_id
     crud.update_skill_level_of_confidence(
         session=get_db_session,
         skill_id=skill_id,
@@ -251,6 +268,9 @@ def test_update_skill_level_of_confidence(
     skill_updated: skill_model | None = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
-    assert skill_updated is not None
-    assert skill_updated.level_of_confidence == skill_2.level_of_confidence
-    assert skill_updated.skill_id == skill_id
+    if expected_warning:
+        assert f"The skill with id {skill_id} doesn't exist" in caplog.text
+    else:
+        assert skill_updated is not None
+        assert skill_updated.skill_id == skill_id
+        assert skill_updated.level_of_confidence == skill_2.level_of_confidence

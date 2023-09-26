@@ -1,12 +1,13 @@
 """CRUD functions."""
-import sqlite3
 from collections.abc import Sequence
 
 import sqlalchemy
 from loguru import logger
-from sqlalchemy import orm, exc
+from sqlalchemy import exc, orm
 
 from app.models.type_aliases import level_of_confidence, skill_base_schema, skill_model
+
+logger.add("test.log")
 
 
 def get_skill_by_id(session: orm.Session, skill_id: int) -> skill_model | None:
@@ -35,14 +36,16 @@ def create_skill(session: orm.Session, skill: skill_base_schema) -> None:
         session.add(skill_db)
         session.commit()
         session.refresh(skill_db)
+        logger.info(f"Skill {skill.skill_name} created successfully")
     except exc.IntegrityError:
-        logger.exception(f"Skill {skill.skill_name} already exist")
+        logger.error(f"Skill {skill.skill_name} already exist")
         session.rollback()
 
 
 def get_skills(session: orm.Session) -> Sequence[skill_model]:
     stmt: sqlalchemy.Select[skill_model] = sqlalchemy.Select(skill_model)
     skills: Sequence[skill_model] = session.scalars(stmt).all()
+    logger.info("Operation 'get_skills' ended successfully")
     return skills
 
 
@@ -50,21 +53,34 @@ def delete_skill(session: orm.Session, skill: skill_model) -> None:
     if skill:
         session.delete(skill)
         session.commit()
+        logger.info(f"Skill {skill.skill_name} deleted successfully")
 
 
 def update_skill_name(session: orm.Session, skill_id: int, new_name: str) -> None:
-    session.execute(
-        statement=sqlalchemy.update(table=skill_model),
-        params={"skill_id": skill_id, "skill_name": new_name},
-    )
-    session.commit()
+    skill = get_skill_by_id(session=session, skill_id=skill_id)
+    if skill is None:
+        logger.warning(f"The skill with id {skill_id} doesn't exist")
+    else:
+        logger.info(f"Changing the name of {skill.skill_name} to {new_name}")
+        session.execute(
+            statement=sqlalchemy.update(table=skill_model),
+            params={"skill_id": skill_id, "skill_name": new_name},
+        )
+        session.commit()
+        logger.info("Skill name changed successfully")
 
 
 def update_skill_level_of_confidence(
     session: orm.Session, skill_id: int, new_level: level_of_confidence
 ) -> None:
-    session.execute(
-        statement=sqlalchemy.update(table=skill_model),
-        params={"skill_id": skill_id, "level_of_confidence": new_level},
-    )
-    session.commit()
+    skill = get_skill_by_id(session=session, skill_id=skill_id)
+    if skill is None:
+        logger.warning(f"The skill with id {skill_id} doesn't exist")
+    else:
+        logger.info(f"Changing the level of {skill.skill_name} to {new_level}")
+        session.execute(
+            statement=sqlalchemy.update(table=skill_model),
+            params={"skill_id": skill_id, "level_of_confidence": new_level},
+        )
+        session.commit()
+        logger.info("Skill level changed successfully")
