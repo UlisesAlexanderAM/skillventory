@@ -38,6 +38,23 @@ skill_place_table = sqlalchemy.Table(
     ),
 )
 
+skill_domain_table = sqlalchemy.Table(
+    "skill_domain_table",
+    config.Base.metadata,
+    sqlalchemy.Column(
+        "skill_id",
+        sqlalchemy.Integer,
+        sqlalchemy.ForeignKey(column="skill.skill_id"),
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "domain_id",
+        sqlalchemy.Integer,
+        sqlalchemy.ForeignKey(column="domain.domain_id"),
+        primary_key=True,
+    ),
+)
+
 
 class Skill(config.Base):
     """Skill SQLAlchemy model.
@@ -66,6 +83,9 @@ class Skill(config.Base):
     )
     places: orm.Mapped[list["PlaceWithGreaterInterest"]] = orm.relationship(
         secondary=skill_place_table, back_populates="skills"
+    )
+    domains: orm.Mapped[list["Domain"]] = orm.relationship(
+        secondary=skill_domain_table, back_populates="skills"
     )
 
 
@@ -97,4 +117,17 @@ class PlaceWithGreaterInterest(config.Base):
     linkedin_link: orm.Mapped[str]
     skills: orm.Mapped[list["Skill"]] = orm.relationship(
         secondary=skill_place_table, back_populates="places"
+    )
+
+
+class Domain(config.Base):
+    __tablename__: str = "domain"
+
+    domain_id: orm.Mapped[int] = orm.mapped_column(primary_key=True)
+    domain_name: orm.Mapped[str] = orm.mapped_column(
+        unique=True, nullable=False, index=True
+    )
+
+    skills: orm.Mapped[list["Skill"]] = orm.relationship(
+        secondary=skill_domain_table, back_populates="domains"
     )

@@ -51,6 +51,14 @@ class PlaceWithGreaterInterestBase(pydantic.BaseModel):
     job_postings_link: Optional[pydantic.HttpUrl]
     linkedin_link: Optional[pydantic.HttpUrl]
 
+    model_config = pydantic.ConfigDict(from_attributes=True)
+
+
+class DomainBase(pydantic.BaseModel):
+    domain_name: str
+
+    model_config = pydantic.ConfigDict(from_attributes=True)
+
 
 class Skill(SkillBase):
     """Skill Pydantic model.
@@ -69,6 +77,7 @@ class Skill(SkillBase):
 
     skill_id: int
     places: list[PlaceWithGreaterInterestBase]
+    domains: list[DomainBase]
 
     model_config = pydantic.ConfigDict(from_attributes=True)
 
@@ -92,5 +101,11 @@ class PlaceWithGreaterInterest(PlaceWithGreaterInterestBase):
 
     place_id: int
     skills: list[SkillBase]
+
+    model_config = pydantic.ConfigDict(from_attributes=True)
+
+
+class Domain(DomainBase):
+    domain_id: int
 
     model_config = pydantic.ConfigDict(from_attributes=True)
