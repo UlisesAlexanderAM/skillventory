@@ -26,6 +26,8 @@ bandit = {extras = ["toml"], version = "^1.7.5"}
 loguru = "^0.7.2"
 pytest-cov = "^4.1.0"
 allure-pytest = "^2.13.2"
+commitizen = "^3.10.0"
+pre-commit = "^3.4.0"
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
@@ -54,6 +56,13 @@ warn_required_dynamic_aliases = true
 warn_untyped_fields = true
 
 
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version_scheme = "pep440"
+version_provider = "poetry"
+update_changelog_on_bump = true
+major_version_zero = true
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
