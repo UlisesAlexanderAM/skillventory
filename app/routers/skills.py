@@ -56,3 +56,19 @@ def get_skill_by_id(
             detail=f"Skill with id {skill_id} not found",
         )
     return skill_db
+
+
+@router.get(
+    "/name/{skill_name}", status_code=status.HTTP_200_OK, response_model=skill_schema
+)
+def get_skill_by_name(
+    skill_name: Annotated[str, fa.Path(title="The name of the skill to get")],
+    session: Annotated[Session, fa.Depends(deps.get_db_session)],
+):
+    skill_db = crud.get_skill_by_name(session=session, skill_name=skill_name)
+    if skill_db is None:
+        raise fa.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Skill with name '{skill_name}' not found",
+        )
+    return skill_db
