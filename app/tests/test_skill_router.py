@@ -18,7 +18,20 @@ def test_get_skill_by_id(
     skill_id: int, expected_status_code: int, skills_json: Sequence[dict[str, str]]
 ):
     client.post("/skills", json=skills_json[0])
-    response: Response = client.get(f"skills/id/{skill_id}")
+    response: Response = client.get(f"/skills/id/{skill_id}")
+
+    assert response.status_code == expected_status_code
+
+
+@pytest.mark.parametrize(
+    "skill_name,expected_status_code",
+    [("python", status.HTTP_200_OK), ("java", status.HTTP_404_NOT_FOUND)],
+)
+def test_get_skill_by_name(
+    skill_name: str, expected_status_code: int, skills_json: Sequence[dict[str, str]]
+):
+    client.post("/skills", json=skills_json[0])
+    response: Response = client.get(f"/skills/name/{skill_name}")
 
     assert response.status_code == expected_status_code
 
