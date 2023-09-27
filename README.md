@@ -83,10 +83,10 @@ erDiagram
         or developing it)"
       - "Estoy aprendiendo o desarrollando (I'm learning or developing it"
       - "Tengo confianza (I'm confident)"
-  - [ ] The skill/knowledge/competence has a list of domains (Optional)
-  - [ ] The skill/knowledge/competence has a list of places with greater interest
+  - [x] The skill/knowledge/competence has a list of domains (Optional)
+  - [x] The skill/knowledge/competence has a list of places with greater interest
     (Optional)
-  - [ ] I can register a new skill/knowledge/competence using an HTTP client
+  - [x] I can register a new skill/knowledge/competence using an HTTP client
 
 - [ ] 2 - Retrieve a skill/knowledge/competence
 
@@ -95,7 +95,7 @@ erDiagram
 
   Acceptance criteria:
 
-  - [x] I can retrieve a skill/knowledge/competence
+  - [ ] I can retrieve a skill/knowledge/competence
     - [x] I can retrieve a skill/knowledge/competence by name
     - [x] I can retrieve a skill/knowledge/competence by id
     - [ ] I can retrieve a skill/knowledge/competence by domain
@@ -108,7 +108,7 @@ erDiagram
   Acceptance criteria:
 
   - [x] I can retrieve all skills/knowledge/competences
-  - [ ] I can retrieve all skills/knowledge/competences using an HTTP client
+  - [x] I can retrieve all skills/knowledge/competences using an HTTP client
 
 - [ ] 4 - Update a skill/knowledge/competence
 
