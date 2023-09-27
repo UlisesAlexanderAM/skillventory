@@ -22,14 +22,14 @@ from typing import Any
 
 import pytest
 from _pytest import logging
-from sqlalchemy.orm import Session
 from loguru import logger
+from sqlalchemy.orm import Session
 
 from app import main
 from app.data import crud, dependencies
 from app.database import config
 from app.models import schemas
-from app.models.type_aliases import skill_base_schema, skill_model, level_of_confidence
+from app.models.type_aliases import level_of_confidence, skill_base_schema
 
 
 @pytest.fixture(scope="module")
@@ -190,57 +190,6 @@ def create_one_skill(
     _skill_1: skill_base_schema = skill_1
     crud.create_skill(session=get_db_session, skill=_skill_1)
     yield _skill_1
-
-
-@pytest.fixture(scope="function")
-def create_two_skill(
-    get_db_session: Session,
-    create_one_skill: skill_base_schema,
-    skill_2: skill_base_schema,
-) -> Iterator[tuple[skill_base_schema, skill_base_schema]]:
-    """Creates two skills in the database.
-
-    Args:
-        get_db_session (Session): The database session fixture.
-        create_one_skill (skill_schema): The skill_1 fixture.
-        skill_2 (skill_schema): The skill_2 fixture.
-
-    Yields:
-        _skill_1 (skill_schema): The created skill_1 object.
-        _skill_2 (skill_schema): The created skill_2 object.
-
-    This fixture uses the skill_1 and skill_2 fixtures and database session
-    to create two skills in the database. It yields the created
-    skill_1 and skill_2 objects.
-    """
-    _skill_1: skill_base_schema = create_one_skill
-    _skill_2: skill_base_schema = skill_2
-    crud.create_skill(session=get_db_session, skill=_skill_2)
-    yield _skill_1, _skill_2
-
-
-@pytest.fixture(scope="function")
-def get_skill_id(
-    get_db_session: Session, create_one_skill: skill_base_schema
-) -> Iterator[int]:
-    """Gets the skill ID from the created skill.
-
-    Args:
-        get_db_session (Session): The database session fixture.
-        create_one_skill (skill_schema): The created skill fixture.
-
-    Yields:
-        The ID of the created skill.
-
-    This fixture gets the skill ID of the skill created by the
-    create_one_skill fixture. It queries the database using the
-    session and skill name.
-    """
-    _skill: skill_model | None = crud.get_skill_by_name(
-        session=get_db_session, skill_name=create_one_skill.skill_name
-    )
-    if _skill is not None:
-        yield _skill.skill_id
 
 
 @pytest.fixture
