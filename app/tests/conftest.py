@@ -51,7 +51,14 @@ def get_db_session() -> Iterator[Session]:
 
 @pytest.fixture(scope="function")
 def override_get_db_session() -> Any:
-    def get_db_session():
+    """Override get_db_session dependecy.
+
+    This is a module scoped fixture that overrides the get_db_session
+    dependency for a function tailored for testing purposes.
+    The sesion is closed after the test finishes executing.
+    """
+
+    def get_db_session() -> Iterator[Session]:
         db: Session = config.TestLocalSession()
         try:
             yield db
@@ -157,8 +164,20 @@ def skill_2(
 @pytest.fixture(scope="session")
 def skills_json(
     skill_1: skill_base_schema, skill_2: skill_base_schema
-) -> Sequence[dict[str, str]]:
-    return [
+) -> Iterator[Sequence[dict[str, str]]]:
+    """Gets a list of skills in dict/json form.
+
+    Args:
+        skill_1: The skill_1 fixture
+        skill_2: The skill_2 fixture
+
+    Yields:
+        A sequence of skills.
+
+    This is a session scope fixture that uses the skill_1 and skill_2 fixtures
+    to create a sequence of skills dicts/json. It yields the created sequence.
+    """
+    yield [
         {
             "skill_name": skill_1.skill_name,
             "level_of_confidence": skill_1.level_of_confidence.value,
@@ -177,11 +196,11 @@ def create_one_skill(
     """Creates one skill in the database.
 
     Args:
-        get_db_session (Session): The database session fixture.
-        skill_1 (skill_schema): The skill_1 fixture.
+        get_db_session: The database session fixture.
+        skill_1: The skill_1 fixture.
 
     Yields:
-        _skill_1 (skill_schema): The created skill.
+        _skill_1: The created skill.
 
     This fixture uses the skill_1 fixture and database session
     to create one skill in the database. It yields the created
@@ -193,15 +212,15 @@ def create_one_skill(
 
 
 @pytest.fixture
-def reportlog(pytestconfig):
-    logging_plugin = pytestconfig.pluginmanager.getplugin("logging-plugin")
-    handler_id = logger.add(logging_plugin.report_handler, format="{message}")
+def reportlog(pytestconfig):  # noqa: D103 # type: ignore
+    logging_plugin = pytestconfig.pluginmanager.getplugin("logging-plugin")  # type: ignore
+    handler_id = logger.add(logging_plugin.report_handler, format="{message}")  # type: ignore
     yield
     logger.remove(handler_id)
 
 
 @pytest.fixture
-def caplog(caplog: logging.LogCaptureFixture):
+def caplog(caplog: logging.LogCaptureFixture):  # noqa: D103
     handler_id = logger.add(
         caplog.handler,
         format="{message}",
