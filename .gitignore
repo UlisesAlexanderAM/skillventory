@@ -401,3 +401,4 @@ tags
 
 # Sonarqube file
 /sonar-project.properties
+compose.override.yml
