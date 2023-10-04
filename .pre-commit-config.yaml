@@ -42,3 +42,6 @@ repos:
             "-o",
             "requirements.txt",
           ]
+
+ci:
+  skip: [poetry-lock]
