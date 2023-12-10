@@ -1,5 +1,8 @@
 # Welcome to Personal Inventory
 
+[Documentation](https://ulisesalexanderam.github.io/Personal-inventory)
+[Source code](https://github.com/UlisesAlexanderAM/Personal-inventory)
+
 Originally a web app to use as a personal inventory.
 Now an API to use create and manage a personal inventory.
 
