@@ -1,6 +1,7 @@
 import enum
 import pydantic
 from typing import Optional
+import sqlmodel
 
 
 class LevelOfConfidence(enum.Enum):
@@ -11,16 +12,12 @@ class LevelOfConfidence(enum.Enum):
     LEVEL_3 = "Tengo confianza"
 
 
-class SkillBase(pydantic.BaseModel):
+class SkillBase(sqlmodel.SQLModel):
     """SkillBase Pydantic model.
 
     Attributes:
         skill_name: The name of the skill.
         level_of_confidence: The level of confidence for the skill.
-
-        model_config: Model configuration from attributes.
-        Allows to access the values of the attributes
-        using dot notations.
 
     This model defines the base fields for a Skill using Pydantic.
     It is used as a base for the Skill schema model.
@@ -29,10 +26,8 @@ class SkillBase(pydantic.BaseModel):
     skill_name: str
     level_of_confidence: LevelOfConfidence
 
-    model_config = pydantic.ConfigDict(from_attributes=True)
 
-
-class PlaceWithGreaterInterestBase(pydantic.BaseModel):
+class PlaceWithGreaterInterestBase(sqlmodel.SQLModel):
     """PlaceWithGreaterInterestBase Pydantic model.
 
     Attributes:
@@ -51,61 +46,6 @@ class PlaceWithGreaterInterestBase(pydantic.BaseModel):
     job_postings_link: Optional[pydantic.HttpUrl]
     linkedin_link: Optional[pydantic.HttpUrl]
 
-    model_config = pydantic.ConfigDict(from_attributes=True)
 
-
-class DomainBase(pydantic.BaseModel):
+class DomainBase(sqlmodel.SQLModel):
     domain_name: str
-
-    model_config = pydantic.ConfigDict(from_attributes=True)
-
-
-class Skill(SkillBase):
-    """Skill Pydantic model.
-
-    Attributes:
-        skill_id: The ID of the skill.
-        places: Related places for the skill.
-
-        model_config: Model configuration from attributes.
-        Allows to access the values of the attributes
-        using dot notations.
-
-    This model defines a complete Skill schema, extending SkillBase.
-    It adds the skill ID and related places fields.
-    """
-
-    skill_id: int
-    places: list[PlaceWithGreaterInterestBase]
-    domains: list[DomainBase]
-
-    model_config = pydantic.ConfigDict(from_attributes=True)
-
-
-class PlaceWithGreaterInterest(PlaceWithGreaterInterestBase):
-    """PlaceWithGreaterInterest Pydantic model.
-
-    Attributes:
-        place_id: The ID of the place.
-        skills: Related skills for the place.
-
-        model_config: Model configuration from attributes.
-        Allows to access the values of the attributes
-        using dot notations.
-
-    This model defines a complete PlaceWithGreaterInterest schema,
-    extending PlaceWithGreaterInterestBase.
-
-    It adds the place ID and related skills fields.
-    """
-
-    place_id: int
-    skills: list[SkillBase]
-
-    model_config = pydantic.ConfigDict(from_attributes=True)
-
-
-class Domain(DomainBase):
-    domain_id: int
-
-    model_config = pydantic.ConfigDict(from_attributes=True)

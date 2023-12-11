@@ -15,49 +15,48 @@ and association tables.
 This allows usage of the models for CRUD operations in SQLAlchemy
 and for serialization/deserialization with Pydantic.
 """
-import sqlalchemy
-from sqlalchemy import orm
+from typing import Optional
+import sqlmodel
 
-from app.database import config
 from app.models import schemas
 
-skill_place_table = sqlalchemy.Table(
-    "skill_place_table",
-    config.Base.metadata,
-    sqlalchemy.Column(
-        "skill_id",
-        sqlalchemy.Integer,
-        sqlalchemy.ForeignKey(column="skill.skill_id"),
-        primary_key=True,
-    ),
-    sqlalchemy.Column(
-        "place_id",
-        sqlalchemy.Integer,
-        sqlalchemy.ForeignKey(column="place_with_greater_interest.place_id"),
-        primary_key=True,
-    ),
-)
+# skill_place_table = sqlalchemy.Table(
+#     "skill_place_table",
+#     config.Base.metadata,
+#     sqlalchemy.Column(
+#         "skill_id",
+#         sqlalchemy.Integer,
+#         sqlalchemy.ForeignKey(column="skill.skill_id"),
+#         primary_key=True,
+#     ),
+#     sqlalchemy.Column(
+#         "place_id",
+#         sqlalchemy.Integer,
+#         sqlalchemy.ForeignKey(column="place_with_greater_interest.place_id"),
+#         primary_key=True,
+#     ),
+# )
 
-skill_domain_table = sqlalchemy.Table(
-    "skill_domain_table",
-    config.Base.metadata,
-    sqlalchemy.Column(
-        "skill_id",
-        sqlalchemy.Integer,
-        sqlalchemy.ForeignKey(column="skill.skill_id"),
-        primary_key=True,
-    ),
-    sqlalchemy.Column(
-        "domain_id",
-        sqlalchemy.Integer,
-        sqlalchemy.ForeignKey(column="domain.domain_id"),
-        primary_key=True,
-    ),
-)
+# skill_domain_table = sqlalchemy.Table(
+#     "skill_domain_table",
+#     config.Base.metadata,
+#     sqlalchemy.Column(
+#         "skill_id",
+#         sqlalchemy.Integer,
+#         sqlalchemy.ForeignKey(column="skill.skill_id"),
+#         primary_key=True,
+#     ),
+#     sqlalchemy.Column(
+#         "domain_id",
+#         sqlalchemy.Integer,
+#         sqlalchemy.ForeignKey(column="domain.domain_id"),
+#         primary_key=True,
+#     ),
+# )
 
 
-class Skill(config.Base):
-    """Skill SQLAlchemy model.
+class Skill(sqlmodel.SQLModel, table=True):
+    """Skill SQLModel model.
 
     Attributes:
         skill_id: Primary key.
@@ -72,24 +71,20 @@ class Skill(config.Base):
     the intermediate table skill_place_table.
     """
 
-    __tablename__: str = "skill"
-
-    skill_id: orm.Mapped[int] = orm.mapped_column(primary_key=True)
-    skill_name: orm.Mapped[str] = orm.mapped_column(
-        unique=True, nullable=False, index=True
-    )
-    level_of_confidence: orm.Mapped[schemas.LevelOfConfidence] = orm.mapped_column(
+    skill_id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    skill_name: str = sqlmodel.Field(unique=True, nullable=False, index=True)
+    level_of_confidence: schemas.LevelOfConfidence = sqlmodel.Field(
         nullable=False, index=True
     )
-    places: orm.Mapped[list["PlaceWithGreaterInterest"]] = orm.relationship(
-        secondary=skill_place_table, back_populates="skills"
-    )
-    domains: orm.Mapped[list["Domain"]] = orm.relationship(
-        secondary=skill_domain_table, back_populates="skills"
-    )
+    # places: orm.Mapped[list["PlaceWithGreaterInterest"]] = orm.relationship(
+    #     secondary=skill_place_table, back_populates="skills"
+    # )
+    # domains: orm.Mapped[list["Domain"]] = orm.relationship(
+    #     secondary=skill_domain_table, back_populates="skills"
+    # )
 
 
-class PlaceWithGreaterInterest(config.Base):
+class PlaceWithGreaterInterest(sqlmodel.SQLModel):
     """PlaceWithGreaterInterest SQLAlchemy model.
 
     Attributes:
@@ -106,28 +101,20 @@ class PlaceWithGreaterInterest(config.Base):
     The relationship to Skill is defined using the intermediate table skill_place_table.
     """
 
-    __tablename__: str = "place_with_greater_interest"
-
-    place_id: orm.Mapped[int] = orm.mapped_column(primary_key=True)
-    place_name: orm.Mapped[str] = orm.mapped_column(
-        unique=True, nullable=False, index=True
-    )
-    website_link: orm.Mapped[str] = orm.mapped_column(nullable=False)
-    job_postings_link: orm.Mapped[str]
-    linkedin_link: orm.Mapped[str]
-    skills: orm.Mapped[list["Skill"]] = orm.relationship(
-        secondary=skill_place_table, back_populates="places"
-    )
+    place_id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    place_name: str = sqlmodel.Field(unique=True, nullable=False, index=True)
+    website_link: str = sqlmodel.Field(nullable=False)
+    job_postings_link: str
+    linkedin_link: str
+    # skills: orm.Mapped[list["Skill"]] = orm.relationship(
+    #     secondary=skill_place_table, back_populates="places"
+    # )
 
 
-class Domain(config.Base):
-    __tablename__: str = "domain"
+class Domain(sqlmodel.SQLModel):
+    domain_id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    domain_name: str = sqlmodel.Field(unique=True, nullable=False, index=True)
 
-    domain_id: orm.Mapped[int] = orm.mapped_column(primary_key=True)
-    domain_name: orm.Mapped[str] = orm.mapped_column(
-        unique=True, nullable=False, index=True
-    )
-
-    skills: orm.Mapped[list["Skill"]] = orm.relationship(
-        secondary=skill_domain_table, back_populates="domains"
-    )
+    # skills: orm.Mapped[list["Skill"]] = orm.relationship(
+    #     secondary=skill_domain_table, back_populates="domains"
+    # )
