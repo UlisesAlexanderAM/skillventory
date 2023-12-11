@@ -46,7 +46,7 @@ disallow_untyped_defs = true
 
 [tool.ruff]
 select = ["E", "F", "W", "N", "D", "B", "Q", "C90", "ICN", "TID", "PL", "RUF"]
-ignore = ["E501", "D407"]
+ignore = ["E501", "D407", "D100","D101","D103"]
 
 [tool.ruff.pydocstyle]
 convention = "google"
