@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "personal-inventory"
 version = "0.1.0"
-description = "Web app to use a personal inventory to manage the skills needed for a job position or to keep track of the desired skills"
+description = "Originally a web app to use as a personal inventory. Now an API to use, create, and manage a personal inventory."
 authors = [
     "Ulises Alexander Arguelles Monjaraz <ulises_alexander_am@proton.me>",
 ]
@@ -50,24 +50,52 @@ preview = true
 [tool.ruff.lint]
 select = [
        #Default rules
-       "E4", "E7", "E9", "F",
+       "E4", "E7", "E9", # pycodestyle errors
+       "F", # pyflakes
        #Non-default rules
-       "C90", "N", "D1", "UP",
-       "S", "B", "A", "C4",
-       "EM", "ICN", "TID", "PL",
-       "FURB","RUF"
+       "C90", # mccabe (too complex)
+       "N", # pep8-naming
+       "UP", # pyupgrade
+       "S", # flake8-bandit
+       "B", # flake8-bugbear
+       "A", # flake8-builtins
+       "C4", # flake8-comprehensions
+       "EM", # flake8-errmsg
+       "ICN", # flake8-import-conventions
+       "PT", # flake8-pytest-style
+       "RET", # flake8-return
+       "SIM", # flake8-simplify
+       "TID", # flake8-tidy-imports
+       "PL", # pylint
+       "RUF" # ruff-specific-rules
        ]
-ignore = ["W191"]
+ignore = []
 # Preview rules
 extend-select = [
-              "PLC0415","PLC1901","PLC2401",
-              "PLC2403","PLE0704","PLE1132",
-              "PLR0202","PLR0203","PLR0904",
-              "PLR0916","PLR0917","PLR1704",
-              "PLR1706","PLR1733","PLR1736",
-              "PLR6201","PLR6301","PLW1501",
-              "PLW1514","PLW3201","FURB",
-              "RUF017","RUF018","RUF019",
+              "PLC0415", # import-outside-top-level
+              "PLC1901", # compare-to-empty-string
+              "PLC2401", # non-ascii-name
+              "PLC2403", # non-ascii-import-name
+              "PLE0704", # misplaced-bare-raise
+              "PLE1132", # repeated-keyword-argument
+              "PLR0202", # no-classmethod-decorator
+              "PLR0203", # no-staticmethod-decorator
+              "PLR0904", # too-many-public-methods
+              "PLR0916", # too-many-boolean-expressions
+              "PLR0917", # too-many-positional
+              "PLR1704", # redefined-argument-from-local
+              "PLR1706", # and-or-ternary
+              "PLR1733", # unnecessary-dict-index-lookup
+              "PLR1736", # unnecessary-list-index-lookup
+              "PLR6201", # literal-membership
+              "PLR6301", # no-self-use
+              "PLW1501", # bad-open-mode
+              "PLW1514", # unspecified-encoding
+              "PLW3201", # bad-dunder-method-name
+              "FURB", # refurb
+              "RUF017", # quadratic-list-summation
+              "RUF018", # assignment-in-assert
+              "RUF019", # unnecessary-key-check
               ]
 
 [tool.ruff.lint.pydocstyle]
