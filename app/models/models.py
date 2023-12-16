@@ -15,44 +15,58 @@ and association tables.
 This allows usage of the models for CRUD operations in SQLAlchemy
 and for serialization/deserialization with Pydantic.
 """
+
+import enum
 from typing import Optional
 import sqlmodel
+import pydantic
 
-from app.models import schemas
 
-# skill_place_table = sqlalchemy.Table(
-#     "skill_place_table",
-#     config.Base.metadata,
-#     sqlalchemy.Column(
-#         "skill_id",
-#         sqlalchemy.Integer,
-#         sqlalchemy.ForeignKey(column="skill.skill_id"),
-#         primary_key=True,
-#     ),
-#     sqlalchemy.Column(
-#         "place_id",
-#         sqlalchemy.Integer,
-#         sqlalchemy.ForeignKey(column="place_with_greater_interest.place_id"),
-#         primary_key=True,
-#     ),
-# )
+class LevelOfConfidence(enum.Enum):
+    """Enum of the level of confidence."""
 
-# skill_domain_table = sqlalchemy.Table(
-#     "skill_domain_table",
-#     config.Base.metadata,
-#     sqlalchemy.Column(
-#         "skill_id",
-#         sqlalchemy.Integer,
-#         sqlalchemy.ForeignKey(column="skill.skill_id"),
-#         primary_key=True,
-#     ),
-#     sqlalchemy.Column(
-#         "domain_id",
-#         sqlalchemy.Integer,
-#         sqlalchemy.ForeignKey(column="domain.domain_id"),
-#         primary_key=True,
-#     ),
-# )
+    LEVEL_1 = "Debo empezar a aprender o desarrollar"
+    LEVEL_2 = "Estoy aprendiendo o desarrollando"
+    LEVEL_3 = "Tengo confianza"
+
+
+class SkillBase(sqlmodel.SQLModel):
+    """SkillBase Pydantic model.
+
+    Attributes:
+        skill_name: The name of the skill.
+        level_of_confidence: The level of confidence for the skill.
+
+    This model defines the base fields for a Skill using Pydantic.
+    It is used as a base for the Skill schema model.
+    """
+
+    skill_name: str
+    level_of_confidence: LevelOfConfidence
+
+
+class PlaceWithGreaterInterestBase(sqlmodel.SQLModel):
+    """PlaceWithGreaterInterestBase Pydantic model.
+
+    Attributes:
+        place_name: The name of the place.
+        website_link: The website link for the place.
+        job_postings_link: Optional job postings link.
+        linkedin_link: Optional LinkedIn link.
+
+    This model defines the base fields for a PlaceWithGreaterInterest
+    using Pydantic. It is used as a base for the PlaceWithGreaterInterest
+    schema model.
+    """
+
+    place_name: str
+    website_link: pydantic.HttpUrl
+    job_postings_link: Optional[pydantic.HttpUrl]
+    linkedin_link: Optional[pydantic.HttpUrl]
+
+
+class DomainBase(sqlmodel.SQLModel):
+    domain_name: str
 
 
 class Skill(sqlmodel.SQLModel, table=True):
@@ -73,9 +87,7 @@ class Skill(sqlmodel.SQLModel, table=True):
 
     skill_id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
     skill_name: str = sqlmodel.Field(unique=True, nullable=False, index=True)
-    level_of_confidence: schemas.LevelOfConfidence = sqlmodel.Field(
-        nullable=False, index=True
-    )
+    level_of_confidence: LevelOfConfidence = sqlmodel.Field(nullable=False, index=True)
     # places: orm.Mapped[list["PlaceWithGreaterInterest"]] = orm.relationship(
     #     secondary=skill_place_table, back_populates="skills"
     # )

@@ -1,8 +1,7 @@
 """Database configuration."""
 
-import sqlalchemy
 import pydantic_settings
-from sqlalchemy import orm, pool
+from sqlalchemy import pool
 import sqlmodel
 from sqlmodel import SQLModel
 
@@ -29,19 +28,11 @@ class DBSettings(pydantic_settings.BaseSettings):
 
 db_settings = DBSettings()
 
-engine: sqlalchemy.Engine = sqlmodel.create_engine(
+engine = sqlmodel.create_engine(
     url=db_settings.SQLITE_URL,
     echo=db_settings.ECHO,
     connect_args={"check_same_thread": False},
 )
-
-LocalSession = orm.sessionmaker(autoflush=False, bind=engine)
-
-Base = SQLModel
-
-
-def create_db_and_tables():
-    Base.metadata.create_all(engine)
 
 
 class DBTestingSettings(pydantic_settings.BaseSettings):
@@ -65,11 +56,16 @@ class DBTestingSettings(pydantic_settings.BaseSettings):
 
 db_testing_settings = DBTestingSettings()
 
-testing_engine = sqlalchemy.create_engine(
+testing_engine = sqlmodel.create_engine(
     url=db_testing_settings.SQLITE_URL,
     echo=True,
     poolclass=pool.StaticPool,
     connect_args={"check_same_thread": False},
 )
 
-TestLocalSession = orm.sessionmaker(autoflush=False, bind=testing_engine)
+
+Base = SQLModel
+
+
+def create_db_and_tables():
+    Base.metadata.create_all(engine)
