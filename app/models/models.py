@@ -86,8 +86,8 @@ class Skill(sqlmodel.SQLModel, table=True):
     """
 
     skill_id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
-    skill_name: str = sqlmodel.Field(unique=True, nullable=False, index=True)
-    level_of_confidence: LevelOfConfidence = sqlmodel.Field(nullable=False, index=True)
+    skill_name: str = sqlmodel.Field(unique=True, index=True)
+    level_of_confidence: LevelOfConfidence = sqlmodel.Field(index=True)
     # places: orm.Mapped[list["PlaceWithGreaterInterest"]] = orm.relationship(
     #     secondary=skill_place_table, back_populates="skills"
     # )
@@ -114,10 +114,10 @@ class PlaceWithGreaterInterest(sqlmodel.SQLModel):
     """
 
     place_id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
-    place_name: str = sqlmodel.Field(unique=True, nullable=False, index=True)
-    website_link: str = sqlmodel.Field(nullable=False)
-    job_postings_link: str
-    linkedin_link: str
+    place_name: str = sqlmodel.Field(unique=True, index=True)
+    website_link: str
+    job_postings_link: Optional[str] = sqlmodel.Field(default=None)
+    linkedin_link: Optional[str] = sqlmodel.Field(default=None)
     # skills: orm.Mapped[list["Skill"]] = orm.relationship(
     #     secondary=skill_place_table, back_populates="places"
     # )
@@ -125,7 +125,7 @@ class PlaceWithGreaterInterest(sqlmodel.SQLModel):
 
 class Domain(sqlmodel.SQLModel):
     domain_id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
-    domain_name: str = sqlmodel.Field(unique=True, nullable=False, index=True)
+    domain_name: str = sqlmodel.Field(unique=True, index=True)
 
     # skills: orm.Mapped[list["Skill"]] = orm.relationship(
     #     secondary=skill_domain_table, back_populates="domains"
