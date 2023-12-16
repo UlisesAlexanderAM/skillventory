@@ -13,9 +13,7 @@ logger.add("test.log")
 
 def get_skill_by_id(session: sqlmodel.Session, skill_id: int) -> models.Skill | None:
     with session:
-        skill = session.exec(
-            sqlmodel.select(models.Skill).where(models.Skill.skill_id == skill_id)
-        ).one_or_none()
+        skill = session.get(models.Skill, skill_id)
     if skill is None:
         logger.warning(f"The skill with id {skill_id} doesn't exists", stacklevel=2)
     logger.info("Operation 'get_skill_by_id' ended successfully")
@@ -30,7 +28,7 @@ def get_skill_by_name(
             sqlmodel.select(models.Skill).where(
                 sqlmodel.col(models.Skill.skill_name) == skill_name
             )
-        ).one_or_none()
+        ).first()
     if skill is None:
         logger.warning(f"The skill named {skill_name} doesn't exists", stacklevel=2)
     logger.info("Operation 'get_skill_by_name' ended successfully")
