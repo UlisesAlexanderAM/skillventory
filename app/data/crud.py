@@ -23,12 +23,11 @@ def get_skill_by_id(session: sqlmodel.Session, skill_id: int) -> models.Skill | 
 def get_skill_by_name(
     session: sqlmodel.Session, skill_name: str
 ) -> models.Skill | None:
-    with session:
-        skill: models.Skill | None = session.exec(
-            sqlmodel.select(models.Skill).where(
-                sqlmodel.col(models.Skill.skill_name) == skill_name
-            )
-        ).first()
+    statement = sqlmodel.select(models.Skill).where(
+        sqlmodel.col(models.Skill.skill_name) == skill_name
+    )
+    results = session.exec(statement=statement)
+    skill = results.first()
     if skill is None:
         logger.warning(f"The skill named {skill_name} doesn't exists", stacklevel=2)
     logger.info("Operation 'get_skill_by_name' ended successfully")
@@ -38,10 +37,9 @@ def get_skill_by_name(
 def create_skill(session: sqlmodel.Session, skill: models.SkillBase) -> None:
     try:
         skill_db = models.Skill(**skill.model_dump())
-        with session:
-            session.add(skill_db)
-            session.commit()
-            session.refresh(skill_db)
+        session.add(skill_db)
+        session.commit()
+        session.refresh(skill_db)
         logger.info(f"Skill {skill.skill_name} created successfully")
     except exc.IntegrityError:
         logger.error(f"Skill {skill.skill_name} already exist")
@@ -49,10 +47,7 @@ def create_skill(session: sqlmodel.Session, skill: models.SkillBase) -> None:
 
 
 def get_skills(session: sqlmodel.Session) -> Sequence[models.Skill]:
-    with session:
-        skills: Sequence[models.Skill] = session.exec(
-            sqlmodel.select(models.Skill)
-        ).all()
+    skills: Sequence[models.Skill] = session.exec(sqlmodel.select(models.Skill)).all()
     logger.info("Operation 'get_skills' ended successfully")
     return skills
 
@@ -70,11 +65,10 @@ def update_skill_name(session: sqlmodel.Session, skill_id: int, new_name: str) -
         logger.warning(f"The skill with id {skill_id} doesn't exist")
     else:
         logger.info(f"Changing the name of {skill.skill_name} to {new_name}")
-        with session:
-            skill.skill_name = new_name
-            session.add(skill)
-            session.commit()
-            session.refresh(skill)
+        skill.skill_name = new_name
+        session.add(skill)
+        session.commit()
+        session.refresh(skill)
         logger.info("Skill name changed successfully")
 
 
@@ -86,9 +80,8 @@ def update_skill_level_of_confidence(
         logger.warning(f"The skill with id {skill_id} doesn't exist")
     else:
         logger.info(f"Changing the level of {skill.skill_name} to {new_level}")
-        with session:
-            skill.level_of_confidence = new_level
-            session.add(skill)
-            session.commit()
-            session.refresh(skill)
+        skill.level_of_confidence = new_level
+        session.add(skill)
+        session.commit()
+        session.refresh(skill)
         logger.info("Skill level changed successfully")

@@ -3,19 +3,15 @@
 from collections.abc import Iterator
 
 import sqlmodel
-from sqlmodel import Session
 
 from app.database import config
 
 
-def get_db_session() -> Iterator[Session]:
+def get_db_session() -> Iterator[sqlmodel.Session]:
     """Gets a database session object.
 
     Yields:
-        db: The database session.
+        session The database session.
     """
-    db: Session = sqlmodel.Session(config.engine)
-    try:
-        yield db
-    finally:
-        db.close()
+    with sqlmodel.Session(config.engine) as session:
+        yield session
