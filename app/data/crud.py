@@ -2,20 +2,19 @@
 
 from collections.abc import Sequence
 
-import sqlalchemy
-from loguru import logger
 import sqlmodel
+from loguru import logger
 from sqlalchemy import exc
 
-from app.models.type_aliases import level_of_confidence, skill_base_model, skill_model
+from app.models import models
 
 logger.add("test.log")
 
 
-def get_skill_by_id(session: sqlmodel.Session, skill_id: int) -> skill_model | None:
+def get_skill_by_id(session: sqlmodel.Session, skill_id: int) -> models.Skill | None:
     with session:
         skill = session.exec(
-            sqlmodel.select(skill_model).where(skill_model.skill_id == skill_id)
+            sqlmodel.select(models.Skill).where(models.Skill.skill_id == skill_id)
         ).one_or_none()
     if skill is None:
         logger.warning(f"The skill with id {skill_id} doesn't exists", stacklevel=2)
@@ -23,12 +22,13 @@ def get_skill_by_id(session: sqlmodel.Session, skill_id: int) -> skill_model | N
     return skill
 
 
-def get_skill_by_name(session: sqlmodel.Session, skill_name: str):
-    skill = None
+def get_skill_by_name(
+    session: sqlmodel.Session, skill_name: str
+) -> models.Skill | None:
     with session:
-        skill = session.exec(
-            sqlmodel.select(skill_model).where(
-                sqlmodel.col(skill_model.skill_name) == skill_name
+        skill: models.Skill | None = session.exec(
+            sqlmodel.select(models.Skill).where(
+                sqlmodel.col(models.Skill.skill_name) == skill_name
             )
         ).one_or_none()
     if skill is None:
@@ -37,9 +37,9 @@ def get_skill_by_name(session: sqlmodel.Session, skill_name: str):
     return skill
 
 
-def create_skill(session: sqlmodel.Session, skill: skill_base_model) -> None:
+def create_skill(session: sqlmodel.Session, skill: models.SkillBase) -> None:
     try:
-        skill_db = skill_model(**skill.model_dump())
+        skill_db = models.Skill(**skill.model_dump())
         with session:
             session.add(skill_db)
             session.commit()
@@ -50,14 +50,16 @@ def create_skill(session: sqlmodel.Session, skill: skill_base_model) -> None:
         session.rollback()
 
 
-def get_skills(session: sqlmodel.Session) -> Sequence[skill_model]:
-    stmt: sqlalchemy.Select[skill_model] = sqlalchemy.Select(skill_model)
-    skills: Sequence[skill_model] = session.scalars(stmt).all()
+def get_skills(session: sqlmodel.Session) -> Sequence[models.Skill]:
+    with session:
+        skills: Sequence[models.Skill] = session.exec(
+            sqlmodel.select(models.Skill)
+        ).all()
     logger.info("Operation 'get_skills' ended successfully")
     return skills
 
 
-def delete_skill(session: sqlmodel.Session, skill: skill_model) -> None:
+def delete_skill(session: sqlmodel.Session, skill: models.Skill) -> None:
     if skill:
         session.delete(skill)
         session.commit()
@@ -65,7 +67,7 @@ def delete_skill(session: sqlmodel.Session, skill: skill_model) -> None:
 
 
 def update_skill_name(session: sqlmodel.Session, skill_id: int, new_name: str) -> None:
-    skill = get_skill_by_id(session=session, skill_id=skill_id)
+    skill: models.Skill | None = get_skill_by_id(session=session, skill_id=skill_id)
     if skill is None:
         logger.warning(f"The skill with id {skill_id} doesn't exist")
     else:
@@ -79,9 +81,9 @@ def update_skill_name(session: sqlmodel.Session, skill_id: int, new_name: str) -
 
 
 def update_skill_level_of_confidence(
-    session: sqlmodel.Session, skill_id: int, new_level: level_of_confidence
+    session: sqlmodel.Session, skill_id: int, new_level: models.LevelOfConfidence
 ) -> None:
-    skill = get_skill_by_id(session=session, skill_id=skill_id)
+    skill: models.Skill | None = get_skill_by_id(session=session, skill_id=skill_id)
     if skill is None:
         logger.warning(f"The skill with id {skill_id} doesn't exist")
     else:

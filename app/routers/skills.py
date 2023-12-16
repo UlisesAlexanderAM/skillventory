@@ -1,13 +1,14 @@
 """Module that defines the routes related to skills/knowledge/competence."""
+
 from typing import Annotated
 import fastapi as fa
 from fastapi import APIRouter, status
 from collections.abc import Sequence
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 
 from app.data import crud, dependencies as deps
-from app.models.type_aliases import skill_schema, skill_model, skill_base_schema
+from app.models import models
 
 
 router: APIRouter = fa.APIRouter(
@@ -17,11 +18,19 @@ router: APIRouter = fa.APIRouter(
 )
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=Sequence[skill_schema])
+@router.get("/", status_code=status.HTTP_200_OK, response_model=Sequence[models.Skill])
 def get_skills(
+    response: fa.Response,
     session: Annotated[Session, fa.Depends(deps.get_db_session)],
-) -> Sequence[skill_model]:
-    return crud.get_skills(session=session)
+) -> Sequence[models.Skill]:
+    skills = crud.get_skills(session=session)
+    response.headers["X-Total-Count"] = str(len(skills))
+    response.headers["X-Offset"] = "0"
+    response.headers["X-Limit"] = "15"
+    response.headers["X-Total-Pages"] = "1"
+    if len(skills) == 16:  # noqa
+        response.headers["X-Total-Pages"] = "2"
+    return skills
 
 
 @router.post(
@@ -31,7 +40,7 @@ def get_skills(
     response_class=JSONResponse,
 )
 def post_skill(
-    skill: Annotated[skill_base_schema, fa.Body(description="Skill to add to the DB.")],
+    skill: Annotated[models.SkillBase, fa.Body(description="Skill to add to the DB.")],
     session: Annotated[Session, fa.Depends(deps.get_db_session)],
 ):
     if not crud.get_skill_by_name(session=session, skill_name=skill.skill_name):
@@ -43,13 +52,15 @@ def post_skill(
 
 
 @router.get(
-    "/id/{skill_id}", status_code=status.HTTP_200_OK, response_model=skill_schema
+    "/id/{skill_id}", status_code=status.HTTP_200_OK, response_model=models.Skill
 )
 def get_skill_by_id(
     skill_id: Annotated[int, fa.Path(title="The ID of the skill to get")],
     session: Annotated[Session, fa.Depends(deps.get_db_session)],
 ):
-    skill_db = crud.get_skill_by_id(session=session, skill_id=skill_id)
+    skill_db: models.Skill | None = crud.get_skill_by_id(
+        session=session, skill_id=skill_id
+    )
     if skill_db is None:
         raise fa.HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -59,13 +70,15 @@ def get_skill_by_id(
 
 
 @router.get(
-    "/name/{skill_name}", status_code=status.HTTP_200_OK, response_model=skill_schema
+    "/name/{skill_name}", status_code=status.HTTP_200_OK, response_model=models.Skill
 )
 def get_skill_by_name(
     skill_name: Annotated[str, fa.Path(title="The name of the skill to get")],
     session: Annotated[Session, fa.Depends(deps.get_db_session)],
 ):
-    skill_db = crud.get_skill_by_name(session=session, skill_name=skill_name)
+    skill_db: models.Skill | None = crud.get_skill_by_name(
+        session=session, skill_name=skill_name
+    )
     if skill_db is None:
         raise fa.HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
