@@ -40,61 +40,65 @@ The first thing you need to do to use this tool is get the source code from the 
 
 #### Git
 
-    ``` shell
-    git clone https://github.com/UlisesAlexanderAM/Personal-inventory
-    ```
+``` shell
+git clone https://github.com/UlisesAlexanderAM/Personal-inventory
+```
 
 #### GitHub ClI
 
-    ``` bash
-    gh repo clone UlisesAlexanderAM/Personal-inventory
-    ```
+```shell
+gh repo clone UlisesAlexanderAM/Personal-inventory
+```
 
 ### Docker compose (Recommended)
 
 #### Local Development/Use
 
-    If you want to use it for local development of the frontend or personal use.
-    And you have the port 8000 in use, you need to change the port in `#!shell compose.yml`
+If you want to use it for local development of the frontend or personal use.
+And you have the port 8000 in use, you need to change the port in `compose.yml`
 
-    ``` title="compose.yml" hl_lines="5"
-    --8<-- "compose.yml"
-    ```
+```dockerfile
+services:
+  app:
+    image: personal-inventory
+    ports:
+      - "8000:80"
+```
 
-    Then you can get the service up with:
+Then you can get the service up with:
 
-    ``` shell
-    docker compose up
-    ```
+```shell
+docker compose up
+```
 
 #### Deployment
 
-    If you want to deploy it, you have to avoid sending the
-    `compose.override.yml` file. Then you can get the service up with:
+If you want to deploy it, you have to avoid sending the
+`compose.override.yml` file. Then you can get the service up with:
 
-    ```
-    docker compose up
-    ```
+```shell
+docker compose up
+```
 
 ### Docker
 
-=== "Local Development/Use"
+#### Local Development/Use
 
-    ```
-    docker run -p <Local_Port>:80 personal-inventory
-    ```
+```shell
+docker run -p <Local_Port>:80 personal-inventory
+```
 
-    Where the `Local_Port` is the port where you want to access the container
-    from the host.
+Where the `Local_Port` is the port where you want to access the container
+from the host.
 
-=== "Deployment"
+#### Deployment
 
-    ```
-    docker run -p <Deployment_Host_Port>:80 personal-inventory
-    ```
+```shell
+docker run -p <Deployment_Host_Port>:80 personal-inventory
+```
 
-    Where the `Deployment_Host_Port` is the port in the deployment host from where
-    you give access to the container.
+Where the `Deployment_Host_Port` is the port in the deployment host from where
+you give access to the container.
 
 ## Usage
 
