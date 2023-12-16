@@ -1,13 +1,13 @@
 """Defines the dependencies used."""
 
 from collections.abc import Iterator
+
 import sqlmodel
-from contextlib import contextmanager
-from app.database import config
 from sqlmodel import Session
 
+from app.database import config
 
-@contextmanager
+
 def get_db_session() -> Iterator[Session]:
     """Gets a database session object.
 
