@@ -30,7 +30,6 @@ from app import main
 from app.data import crud, dependencies
 from app.database import config
 from app.models import models
-from app.models.type_aliases import level_of_confidence, skill_base_model
 
 
 @pytest.fixture(scope="module")
@@ -92,7 +91,9 @@ def setup_db(get_db_session: Session) -> Any:
 
 
 @pytest.fixture(scope="session")
-def skill_factory() -> Iterator[Callable[[str, level_of_confidence], skill_base_model]]:
+def skill_factory() -> (
+    Iterator[Callable[[str, models.LevelOfConfidence], models.SkillBase]]
+):
     """Gets a skill factory fixture.
 
     Yields:
@@ -103,8 +104,8 @@ def skill_factory() -> Iterator[Callable[[str, level_of_confidence], skill_base_
     """
 
     def _skill_factory(
-        skill_name: str, level_of_confidence: level_of_confidence
-    ) -> skill_base_model:
+        skill_name: str, level_of_confidence: models.LevelOfConfidence
+    ) -> models.SkillBase:
         """Creates a Skill model object.
 
         Args:
@@ -128,8 +129,8 @@ def skill_factory() -> Iterator[Callable[[str, level_of_confidence], skill_base_
 
 @pytest.fixture(scope="session")
 def skill_1(
-    skill_factory: Callable[[str, level_of_confidence], skill_base_model],
-) -> Iterator[skill_base_model]:
+    skill_factory: Callable[[str, models.LevelOfConfidence], models.SkillBase],
+) -> Iterator[models.SkillBase]:
     """Gets a skill_1 fixture.
 
     Args:
@@ -147,8 +148,8 @@ def skill_1(
 
 @pytest.fixture(scope="session")
 def skill_2(
-    skill_factory: Callable[[str, level_of_confidence], skill_base_model],
-) -> Iterator[skill_base_model]:
+    skill_factory: Callable[[str, models.LevelOfConfidence], models.SkillBase],
+) -> Iterator[models.SkillBase]:
     """Gets a skill_2 fixture.
 
     Args:
@@ -202,8 +203,8 @@ def skills_json() -> Iterator[Sequence[dict[str, str]]]:
 
 @pytest.fixture(scope="function")
 def create_one_skill(
-    get_db_session: Session, skill_1: skill_base_model
-) -> Iterator[skill_base_model]:
+    get_db_session: Session, skill_1: models.SkillBase
+) -> Iterator[models.SkillBase]:
     """Creates one skill in the database.
 
     Args:
@@ -217,7 +218,7 @@ def create_one_skill(
     to create one skill in the database. It yields the created
     skill object.
     """
-    _skill_1: skill_base_model = skill_1
+    _skill_1: models.SkillBase = skill_1
     crud.create_skill(session=get_db_session, skill=_skill_1)
     yield _skill_1
 

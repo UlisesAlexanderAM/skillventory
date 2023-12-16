@@ -30,7 +30,7 @@ import pytest
 from sqlmodel import Session
 
 from app.data import crud
-from app.models.type_aliases import skill_base_model, skill_model
+from app.models import models
 
 MULTIPLE_SKILLS = 2
 
@@ -38,7 +38,7 @@ MULTIPLE_SKILLS = 2
 @pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
 def test_get_skill_by_id(
     get_db_session: Session,
-    create_one_skill: skill_model,  # pyright:ignore
+    create_one_skill: models.Skill,  # pyright:ignore
     skill_id: int,
     expected_warning: bool,
     caplog,
@@ -73,7 +73,7 @@ def test_get_skill_by_id(
 )
 def test_get_skill_by_name(
     get_db_session: Session,
-    create_one_skill: skill_base_model,  # pyright:ignore
+    create_one_skill: models.SkillBase,  # pyright:ignore
     skill_name: str,
     expected_warning: bool,
     caplog,
@@ -102,7 +102,7 @@ def test_get_skill_by_name(
 @pytest.mark.parametrize("expected_exception", [False, True])
 def test_create_skill(
     get_db_session: Session,
-    skill_1: skill_base_model,
+    skill_1: models.SkillBase,
     expected_exception: bool,
     caplog,
 ) -> None:
@@ -119,7 +119,7 @@ def test_create_skill(
     - Validates the error message and exception type.
     """
     crud.create_skill(session=get_db_session, skill=skill_1)
-    skill: skill_model | None = crud.get_skill_by_name(
+    skill: models.Skill | None = crud.get_skill_by_name(
         session=get_db_session, skill_name=skill_1.skill_name
     )
     assert skill is not None
@@ -134,8 +134,8 @@ def test_create_skill(
 @pytest.mark.parametrize("number_of_skills", [0, 1, 2])
 def test_get_skills(
     get_db_session: Session,
-    skill_1: skill_base_model,
-    skill_2: skill_base_model,
+    skill_1: models.SkillBase,
+    skill_2: models.SkillBase,
     number_of_skills: Literal[0, 1, 2],
 ) -> None:
     """Tests getting all skills from the database.
@@ -153,12 +153,12 @@ def test_get_skills(
     3. Validates the number of skills matches number_of_skills.
     4. If skills were created, validates their attributes match the fixtures.
     """
-    skills: list[skill_base_model] = [skill_1, skill_2]
-    skills_wanted: list[skill_base_model] = []
+    skills: list[models.SkillBase] = [skill_1, skill_2]
+    skills_wanted: list[models.SkillBase] = []
     for _ in range(number_of_skills):
         crud.create_skill(session=get_db_session, skill=skills[_])
         skills_wanted.append(skills[_])
-    skills_db: Sequence[skill_model] = crud.get_skills(session=get_db_session)
+    skills_db: Sequence[models.Skill] = crud.get_skills(session=get_db_session)
 
     assert len(skills_db) == number_of_skills
 
@@ -169,7 +169,7 @@ def test_get_skills(
 
 @pytest.mark.parametrize("skill_id", [1, 2])
 def test_delete_skill(
-    get_db_session: Session, create_one_skill: skill_model, skill_id: Literal[1, 2]
+    get_db_session: Session, create_one_skill: models.Skill, skill_id: Literal[1, 2]
 ) -> None:
     """Tests deleting a skill by ID.
 
@@ -186,7 +186,7 @@ def test_delete_skill(
     4. Checks that a UserWarning is raised if skill not found.
     5. Validates the correct number of warnings were raised.
     """
-    skill: skill_model | None = crud.get_skill_by_id(
+    skill: models.Skill | None = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
     crud.delete_skill(session=get_db_session, skill=skill)
@@ -196,8 +196,8 @@ def test_delete_skill(
 @pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
 def test_update_skill_name(
     get_db_session: Session,
-    create_one_skill: skill_model,
-    skill_2: skill_base_model,
+    create_one_skill: models.Skill,
+    skill_2: models.SkillBase,
     skill_id: Literal[1, 2],
     expected_warning: bool,
     caplog,
@@ -221,7 +221,7 @@ def test_update_skill_name(
     crud.update_skill_name(
         session=get_db_session, skill_id=skill_id, new_name=skill_2.skill_name
     )
-    skill_updated: skill_model | None = crud.get_skill_by_id(
+    skill_updated: models.Skill | None = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
     if expected_warning:
@@ -235,8 +235,8 @@ def test_update_skill_name(
 @pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
 def test_update_skill_level_of_confidence(
     get_db_session: Session,
-    create_one_skill: skill_model,
-    skill_2: skill_base_model,
+    create_one_skill: models.Skill,
+    skill_2: models.SkillBase,
     skill_id: int,
     expected_warning: bool,
     caplog,
@@ -261,7 +261,7 @@ def test_update_skill_level_of_confidence(
         skill_id=skill_id,
         new_level=skill_2.level_of_confidence,
     )
-    skill_updated: skill_model | None = crud.get_skill_by_id(
+    skill_updated: models.Skill | None = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
     if expected_warning:
