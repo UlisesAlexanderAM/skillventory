@@ -9,6 +9,8 @@ theme:
     - navigation.tracking
     - toc.follow
     - toc.integrate
+    - content.code.copy
+    - content.tabs.link
   palette:
     - scheme: default
       primary: deep purple
@@ -25,6 +27,14 @@ theme:
 markdown_extensions:
   - toc:
       permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.tabbed:
+      alternate_style: true
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.snippets
+  - pymdownx.inlinehilite
