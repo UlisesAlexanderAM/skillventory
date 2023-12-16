@@ -23,13 +23,14 @@ from typing import Any
 import pytest
 from _pytest import logging
 from loguru import logger
-from sqlalchemy.orm import Session
+from sqlmodel import Session
+import sqlmodel
 
 from app import main
 from app.data import crud, dependencies
 from app.database import config
-from app.models import schemas
-from app.models.type_aliases import level_of_confidence, skill_base_schema
+from app.models import models
+from app.models.type_aliases import level_of_confidence, skill_base_model
 
 
 @pytest.fixture(scope="module")
@@ -42,7 +43,7 @@ def get_db_session() -> Iterator[Session]:
     This is a module scoped fixture that yields a database session.
     The session is closed after the test finishes executing.
     """
-    db: Session = config.TestLocalSession()
+    db: Session = sqlmodel.Session(config.testing_engine)
     try:
         yield db
     finally:
@@ -59,13 +60,17 @@ def override_get_db_session() -> Any:
     """
 
     def get_db_session() -> Iterator[Session]:
-        db: Session = config.TestLocalSession()
+        db: Session = sqlmodel.Session(config.testing_engine)
         try:
             yield db
         finally:
             db.close()
 
     main.app.dependency_overrides[dependencies.get_db_session] = get_db_session
+    try:
+        yield config.Base.metadata.create_all(bind=config.testing_engine)
+    finally:
+        config.Base.metadata.drop_all(bind=config.testing_engine)
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -87,9 +92,7 @@ def setup_db(get_db_session: Session) -> Any:
 
 
 @pytest.fixture(scope="session")
-def skill_factory() -> (
-    Iterator[Callable[[str, level_of_confidence], skill_base_schema]]
-):
+def skill_factory() -> Iterator[Callable[[str, level_of_confidence], skill_base_model]]:
     """Gets a skill factory fixture.
 
     Yields:
@@ -101,21 +104,21 @@ def skill_factory() -> (
 
     def _skill_factory(
         skill_name: str, level_of_confidence: level_of_confidence
-    ) -> skill_base_schema:
-        """Creates a Skill schema object.
+    ) -> skill_base_model:
+        """Creates a Skill model object.
 
         Args:
             skill_name: The name of the skill.
             level_of_confidence: The level of confidence for the skill.
 
         Returns:
-            The created Skill schema object.
+            The created Skill model object.
 
         This function takes in a skill name and level of confidence and returns a
-        Skill schema object with those values. It is used as a factory function to
+        Skill model object with those values. It is used as a factory function to
         create Skill objects for testing.
         """
-        skill = schemas.SkillBase(
+        skill = models.SkillBase(
             skill_name=skill_name, level_of_confidence=level_of_confidence
         )
         return skill
@@ -125,8 +128,8 @@ def skill_factory() -> (
 
 @pytest.fixture(scope="session")
 def skill_1(
-    skill_factory: Callable[[str, level_of_confidence], skill_base_schema]
-) -> Iterator[skill_base_schema]:
+    skill_factory: Callable[[str, level_of_confidence], skill_base_model],
+) -> Iterator[skill_base_model]:
     """Gets a skill_1 fixture.
 
     Args:
@@ -139,13 +142,13 @@ def skill_1(
     a skill_1 object with name 'python' and confidence level 'LEVEL_2'. It yields
     the created skill_1 object.
     """
-    yield skill_factory("python", schemas.LevelOfConfidence.LEVEL_2)
+    yield skill_factory("python", models.LevelOfConfidence.LEVEL_2)
 
 
 @pytest.fixture(scope="session")
 def skill_2(
-    skill_factory: Callable[[str, level_of_confidence], skill_base_schema]
-) -> Iterator[skill_base_schema]:
+    skill_factory: Callable[[str, level_of_confidence], skill_base_model],
+) -> Iterator[skill_base_model]:
     """Gets a skill_2 fixture.
 
     Args:
@@ -158,13 +161,11 @@ def skill_2(
     a skill_2 object with name 'typescript' and confidence level 'LEVEL_1'. It yields
     the created skill_2 object.
     """
-    yield skill_factory("typescript", schemas.LevelOfConfidence.LEVEL_1)
+    yield skill_factory("typescript", models.LevelOfConfidence.LEVEL_1)
 
 
 @pytest.fixture(scope="session")
-def skills_json(
-    skill_1: skill_base_schema, skill_2: skill_base_schema
-) -> Iterator[Sequence[dict[str, str]]]:
+def skills_json() -> Iterator[Sequence[dict[str, str]]]:
     """Gets a list of skills in dict/json form.
 
     Args:
@@ -177,22 +178,32 @@ def skills_json(
     This is a session scope fixture that uses the skill_1 and skill_2 fixtures
     to create a sequence of skills dicts/json. It yields the created sequence.
     """
-    yield [
-        {
-            "skill_name": skill_1.skill_name,
-            "level_of_confidence": skill_1.level_of_confidence.value,
-        },
-        {
-            "skill_name": skill_2.skill_name,
-            "level_of_confidence": skill_2.level_of_confidence.value,
-        },
-    ]
+    # yield [
+    #     {
+    #         "skill_name": skill_1.skill_name,
+    #         "level_of_confidence": skill_1.level_of_confidence.value,
+    #     },
+    #     {
+    #         "skill_name": skill_2.skill_name,
+    #         "level_of_confidence": skill_2.level_of_confidence.value,
+    #     },
+    # ]
+    skills_names = [f"python_{x}" for x in range(16)]
+    level_of_confidence: list[str] = []
+    skill_json: Sequence[dict[str, str]] = []
+    for _ in range(16):
+        level_of_confidence.append(models.LevelOfConfidence.LEVEL_1.value)
+    for num in range(16):
+        keys = ("skill_name", "level_of_confidence")
+        value = (skills_names[num], level_of_confidence[num])
+        skill_json.append(dict(zip(keys, value, strict=True)))
+    yield skill_json
 
 
 @pytest.fixture(scope="function")
 def create_one_skill(
-    get_db_session: Session, skill_1: skill_base_schema
-) -> Iterator[skill_base_schema]:
+    get_db_session: Session, skill_1: skill_base_model
+) -> Iterator[skill_base_model]:
     """Creates one skill in the database.
 
     Args:
@@ -206,13 +217,13 @@ def create_one_skill(
     to create one skill in the database. It yields the created
     skill object.
     """
-    _skill_1: skill_base_schema = skill_1
+    _skill_1: skill_base_model = skill_1
     crud.create_skill(session=get_db_session, skill=_skill_1)
     yield _skill_1
 
 
 @pytest.fixture
-def reportlog(pytestconfig):  # noqa: D103 # type: ignore
+def reportlog(pytestconfig):  # type: ignore
     logging_plugin = pytestconfig.pluginmanager.getplugin("logging-plugin")  # type: ignore
     handler_id = logger.add(logging_plugin.report_handler, format="{message}")  # type: ignore
     yield
@@ -220,7 +231,7 @@ def reportlog(pytestconfig):  # noqa: D103 # type: ignore
 
 
 @pytest.fixture
-def caplog(caplog: logging.LogCaptureFixture):  # noqa: D103
+def caplog(caplog: logging.LogCaptureFixture):
     handler_id = logger.add(
         caplog.handler,
         format="{message}",

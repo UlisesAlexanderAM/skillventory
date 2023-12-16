@@ -27,10 +27,10 @@ from collections.abc import Sequence
 from typing import Literal
 
 import pytest
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 
 from app.data import crud
-from app.models.type_aliases import skill_base_schema, skill_model
+from app.models.type_aliases import skill_base_model, skill_model
 
 MULTIPLE_SKILLS = 2
 
@@ -58,9 +58,7 @@ def test_get_skill_by_id(
     It expects a UserWarning if the skill does not exist, or no warning if it does.
     The warning match is checked and the returned skill is validated if no warning.
     """
-    skill: skill_model | None = crud.get_skill_by_id(
-        session=get_db_session, skill_id=skill_id
-    )
+    skill = crud.get_skill_by_id(session=get_db_session, skill_id=skill_id)
 
     if expected_warning:
         assert f"The skill with id {skill_id} doesn't exists" in caplog.text
@@ -75,7 +73,7 @@ def test_get_skill_by_id(
 )
 def test_get_skill_by_name(
     get_db_session: Session,
-    create_one_skill: skill_base_schema,  # pyright:ignore
+    create_one_skill: skill_base_model,  # pyright:ignore
     skill_name: str,
     expected_warning: bool,
     caplog,
@@ -92,9 +90,7 @@ def test_get_skill_by_name(
     If the skill is found, no warning is expected. If not found, a warning is expected.
     If the skill is found, assert it matches the created skill.
     """
-    skill: skill_model | None = crud.get_skill_by_name(
-        session=get_db_session, skill_name=skill_name
-    )
+    skill = crud.get_skill_by_name(session=get_db_session, skill_name=skill_name)
 
     if expected_warning:
         assert f"The skill named {skill_name} doesn't exists" in caplog.text
@@ -106,7 +102,7 @@ def test_get_skill_by_name(
 @pytest.mark.parametrize("expected_exception", [False, True])
 def test_create_skill(
     get_db_session: Session,
-    skill_1: skill_base_schema,
+    skill_1: skill_base_model,
     expected_exception: bool,
     caplog,
 ) -> None:
@@ -138,8 +134,8 @@ def test_create_skill(
 @pytest.mark.parametrize("number_of_skills", [0, 1, 2])
 def test_get_skills(
     get_db_session: Session,
-    skill_1: skill_base_schema,
-    skill_2: skill_base_schema,
+    skill_1: skill_base_model,
+    skill_2: skill_base_model,
     number_of_skills: Literal[0, 1, 2],
 ) -> None:
     """Tests getting all skills from the database.
@@ -157,8 +153,8 @@ def test_get_skills(
     3. Validates the number of skills matches number_of_skills.
     4. If skills were created, validates their attributes match the fixtures.
     """
-    skills: list[skill_base_schema] = [skill_1, skill_2]
-    skills_wanted: list[skill_base_schema] = []
+    skills: list[skill_base_model] = [skill_1, skill_2]
+    skills_wanted: list[skill_base_model] = []
     for _ in range(number_of_skills):
         crud.create_skill(session=get_db_session, skill=skills[_])
         skills_wanted.append(skills[_])
@@ -201,7 +197,7 @@ def test_delete_skill(
 def test_update_skill_name(
     get_db_session: Session,
     create_one_skill: skill_model,
-    skill_2: skill_base_schema,
+    skill_2: skill_base_model,
     skill_id: Literal[1, 2],
     expected_warning: bool,
     caplog,
@@ -240,7 +236,7 @@ def test_update_skill_name(
 def test_update_skill_level_of_confidence(
     get_db_session: Session,
     create_one_skill: skill_model,
-    skill_2: skill_base_schema,
+    skill_2: skill_base_model,
     skill_id: int,
     expected_warning: bool,
     caplog,
