@@ -2,6 +2,7 @@
 
 import pydantic_settings
 from sqlalchemy import pool
+import sqlalchemy
 import sqlmodel
 from sqlmodel import SQLModel
 
@@ -28,7 +29,7 @@ class DBSettings(pydantic_settings.BaseSettings):
 
 db_settings = DBSettings()
 
-engine = sqlmodel.create_engine(
+engine: sqlalchemy.Engine = sqlmodel.create_engine(
     url=db_settings.SQLITE_URL,
     echo=db_settings.ECHO,
     connect_args={"check_same_thread": False},
@@ -56,7 +57,7 @@ class DBTestingSettings(pydantic_settings.BaseSettings):
 
 db_testing_settings = DBTestingSettings()
 
-testing_engine = sqlmodel.create_engine(
+testing_engine: sqlalchemy.Engine = sqlmodel.create_engine(
     url=db_testing_settings.SQLITE_URL,
     echo=True,
     poolclass=pool.StaticPool,
@@ -67,5 +68,5 @@ testing_engine = sqlmodel.create_engine(
 Base = SQLModel
 
 
-def create_db_and_tables():
+def create_db_and_tables() -> None:
     Base.metadata.create_all(engine)

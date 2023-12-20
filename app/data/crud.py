@@ -1,6 +1,7 @@
 """CRUD functions."""
 
 from collections.abc import Sequence
+from typing import Optional
 
 import sqlmodel
 from loguru import logger
@@ -11,9 +12,8 @@ from app.models import models
 logger.add("test.log")
 
 
-def get_skill_by_id(session: sqlmodel.Session, skill_id: int) -> models.Skill | None:
-    with session:
-        skill = session.get(models.Skill, skill_id)
+def get_skill_by_id(session: sqlmodel.Session, skill_id: int) -> Optional[models.Skill]:
+    skill: Optional[models.Skill] = session.get(models.Skill, skill_id)
     if skill is None:
         logger.warning(f"The skill with id {skill_id} doesn't exists", stacklevel=2)
     logger.info("Operation 'get_skill_by_id' ended successfully")
@@ -22,12 +22,12 @@ def get_skill_by_id(session: sqlmodel.Session, skill_id: int) -> models.Skill | 
 
 def get_skill_by_name(
     session: sqlmodel.Session, skill_name: str
-) -> models.Skill | None:
+) -> Optional[models.Skill]:
     statement = sqlmodel.select(models.Skill).where(
         sqlmodel.col(models.Skill.skill_name) == skill_name
     )
     results = session.exec(statement=statement)
-    skill = results.first()
+    skill: Optional[models.Skill] = results.first()
     if skill is None:
         logger.warning(f"The skill named {skill_name} doesn't exists", stacklevel=2)
     logger.info("Operation 'get_skill_by_name' ended successfully")
@@ -36,7 +36,7 @@ def get_skill_by_name(
 
 def create_skill(session: sqlmodel.Session, skill: models.SkillBase) -> None:
     try:
-        skill_db = models.Skill(**skill.model_dump())
+        skill_db: models.Skill = models.Skill(**skill.model_dump())
         session.add(skill_db)
         session.commit()
         session.refresh(skill_db)
@@ -52,7 +52,7 @@ def get_skills(session: sqlmodel.Session) -> Sequence[models.Skill]:
     return skills
 
 
-def delete_skill(session: sqlmodel.Session, skill: models.Skill) -> None:
+def delete_skill(session: sqlmodel.Session, skill: Optional[models.Skill]) -> None:
     if skill:
         session.delete(skill)
         session.commit()
@@ -60,7 +60,7 @@ def delete_skill(session: sqlmodel.Session, skill: models.Skill) -> None:
 
 
 def update_skill_name(session: sqlmodel.Session, skill_id: int, new_name: str) -> None:
-    skill: models.Skill | None = get_skill_by_id(session=session, skill_id=skill_id)
+    skill: Optional[models.Skill] = get_skill_by_id(session=session, skill_id=skill_id)
     if skill is None:
         logger.warning(f"The skill with id {skill_id} doesn't exist")
     else:
@@ -75,7 +75,7 @@ def update_skill_name(session: sqlmodel.Session, skill_id: int, new_name: str) -
 def update_skill_level_of_confidence(
     session: sqlmodel.Session, skill_id: int, new_level: models.LevelOfConfidence
 ) -> None:
-    skill: models.Skill | None = get_skill_by_id(session=session, skill_id=skill_id)
+    skill: Optional[models.Skill] = get_skill_by_id(session=session, skill_id=skill_id)
     if skill is None:
         logger.warning(f"The skill with id {skill_id} doesn't exist")
     else:
