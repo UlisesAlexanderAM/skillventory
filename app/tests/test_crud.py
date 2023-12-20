@@ -24,7 +24,7 @@ Tests:
 """
 
 from collections.abc import Sequence
-from typing import Literal
+from typing import Any, Literal, Optional
 
 import pytest
 from sqlmodel import Session
@@ -41,7 +41,7 @@ def test_get_skill_by_id(
     create_one_skill: models.Skill,  # pyright:ignore
     skill_id: int,
     expected_warning: bool,
-    caplog,
+    caplog: Any,
 ) -> None:
     """Tests getting a skill by ID.
 
@@ -58,7 +58,9 @@ def test_get_skill_by_id(
     It expects a UserWarning if the skill does not exist, or no warning if it does.
     The warning match is checked and the returned skill is validated if no warning.
     """
-    skill = crud.get_skill_by_id(session=get_db_session, skill_id=skill_id)
+    skill: Optional[models.Skill] = crud.get_skill_by_id(
+        session=get_db_session, skill_id=skill_id
+    )
 
     if expected_warning:
         assert f"The skill with id {skill_id} doesn't exists" in caplog.text
@@ -76,7 +78,7 @@ def test_get_skill_by_name(
     create_one_skill: models.SkillBase,  # pyright:ignore
     skill_name: str,
     expected_warning: bool,
-    caplog,
+    caplog: Any,
 ) -> None:
     """Tests get_skill_by_name.
 
@@ -104,7 +106,7 @@ def test_create_skill(
     get_db_session: Session,
     skill_1: models.SkillBase,
     expected_exception: bool,
-    caplog,
+    caplog: Any,
 ) -> None:
     """Tests creating a skill.
 
@@ -119,7 +121,7 @@ def test_create_skill(
     - Validates the error message and exception type.
     """
     crud.create_skill(session=get_db_session, skill=skill_1)
-    skill: models.Skill | None = crud.get_skill_by_name(
+    skill: Optional[models.Skill] = crud.get_skill_by_name(
         session=get_db_session, skill_name=skill_1.skill_name
     )
     assert skill is not None
@@ -186,7 +188,7 @@ def test_delete_skill(
     4. Checks that a UserWarning is raised if skill not found.
     5. Validates the correct number of warnings were raised.
     """
-    skill: models.Skill | None = crud.get_skill_by_id(
+    skill: Optional[models.Skill] = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
     crud.delete_skill(session=get_db_session, skill=skill)
@@ -200,7 +202,7 @@ def test_update_skill_name(
     skill_2: models.SkillBase,
     skill_id: Literal[1, 2],
     expected_warning: bool,
-    caplog,
+    caplog: Any,
 ) -> None:
     """Tests updating the name for a skill.
 
@@ -221,7 +223,7 @@ def test_update_skill_name(
     crud.update_skill_name(
         session=get_db_session, skill_id=skill_id, new_name=skill_2.skill_name
     )
-    skill_updated: models.Skill | None = crud.get_skill_by_id(
+    skill_updated: Optional[models.Skill] = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
     if expected_warning:
@@ -239,7 +241,7 @@ def test_update_skill_level_of_confidence(
     skill_2: models.SkillBase,
     skill_id: int,
     expected_warning: bool,
-    caplog,
+    caplog: Any,
 ) -> None:
     """Tests updating the level of confidence for a skill.
 
@@ -261,7 +263,7 @@ def test_update_skill_level_of_confidence(
         skill_id=skill_id,
         new_level=skill_2.level_of_confidence,
     )
-    skill_updated: models.Skill | None = crud.get_skill_by_id(
+    skill_updated: Optional[models.Skill] = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
     if expected_warning:

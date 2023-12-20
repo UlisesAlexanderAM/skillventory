@@ -16,7 +16,7 @@ client = testclient.TestClient(app=main.app)
 )
 def test_get_skill_by_id(
     skill_id: int, expected_status_code: int, skills_json: Sequence[dict[str, str]]
-):
+) -> None:
     client.post("/skills", json=skills_json[0])
     response: Response = client.get(f"/skills/id/{skill_id}")
 
@@ -29,7 +29,7 @@ def test_get_skill_by_id(
 )
 def test_get_skill_by_name(
     skill_name: str, expected_status_code: int, skills_json: Sequence[dict[str, str]]
-):
+) -> None:
     client.post("/skills", json=skills_json[0])
     response: Response = client.get(f"/skills/name/{skill_name}")
 
@@ -70,7 +70,7 @@ def test_get_skills(num_skills: int, skills_json: Sequence[dict[str, str]]) -> N
 @pytest.mark.parametrize("num_skills,expected_num_pages", [(1, 1), (16, 2)])
 def test_get_num_of_skills_pages(
     num_skills: int, expected_num_pages: int, skills_json: Sequence[dict[str, str]]
-):
+) -> None:
     for _ in range(num_skills):
         client.post("/skills", json=skills_json[_])
     response: Response = client.get("/skills")

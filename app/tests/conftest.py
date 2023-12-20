@@ -23,7 +23,6 @@ from typing import Any
 import pytest
 from _pytest import logging
 from loguru import logger
-from sqlmodel import Session
 import sqlmodel
 
 from app import main
@@ -33,7 +32,7 @@ from app.models import models
 
 
 @pytest.fixture(scope="module")
-def get_db_session() -> Iterator[Session]:
+def get_db_session() -> Iterator[sqlmodel.Session]:
     """Gets a database session fixture.
 
     Yields:
@@ -42,11 +41,8 @@ def get_db_session() -> Iterator[Session]:
     This is a module scoped fixture that yields a database session.
     The session is closed after the test finishes executing.
     """
-    db: Session = sqlmodel.Session(config.testing_engine)
-    try:
-        yield db
-    finally:
-        db.close()
+    with sqlmodel.Session(config.testing_engine) as session:
+        yield session
 
 
 @pytest.fixture(scope="function")
@@ -58,12 +54,9 @@ def override_get_db_session() -> Any:
     The sesion is closed after the test finishes executing.
     """
 
-    def get_db_session() -> Iterator[Session]:
-        db: Session = sqlmodel.Session(config.testing_engine)
-        try:
-            yield db
-        finally:
-            db.close()
+    def get_db_session() -> Iterator[sqlmodel.Session]:
+        with sqlmodel.Session(config.testing_engine) as session:
+            yield session
 
     main.app.dependency_overrides[dependencies.get_db_session] = get_db_session
     try:
@@ -73,7 +66,7 @@ def override_get_db_session() -> Any:
 
 
 @pytest.fixture(scope="function", autouse=True)
-def setup_db(get_db_session: Session) -> Any:
+def setup_db(get_db_session: sqlmodel.Session) -> Any:
     """Sets up and tears down the database for tests.
 
     Args:
@@ -191,7 +184,7 @@ def skills_json() -> Iterator[Sequence[dict[str, str]]]:
     # ]
     skills_names = [f"python_{x}" for x in range(16)]
     level_of_confidence: list[str] = []
-    skill_json: Sequence[dict[str, str]] = []
+    skill_json: list[dict[str, str]] = []
     for _ in range(16):
         level_of_confidence.append(models.LevelOfConfidence.LEVEL_1.value)
     for num in range(16):
@@ -203,7 +196,7 @@ def skills_json() -> Iterator[Sequence[dict[str, str]]]:
 
 @pytest.fixture(scope="function")
 def create_one_skill(
-    get_db_session: Session, skill_1: models.SkillBase
+    get_db_session: sqlmodel.Session, skill_1: models.SkillBase
 ) -> Iterator[models.SkillBase]:
     """Creates one skill in the database.
 
@@ -224,15 +217,15 @@ def create_one_skill(
 
 
 @pytest.fixture
-def reportlog(pytestconfig):  # type: ignore
-    logging_plugin = pytestconfig.pluginmanager.getplugin("logging-plugin")  # type: ignore
-    handler_id = logger.add(logging_plugin.report_handler, format="{message}")  # type: ignore
+def reportlog(pytestconfig: Any):
+    logging_plugin = pytestconfig.pluginmanager.getplugin("logging-plugin")
+    handler_id = logger.add(logging_plugin.report_handler, format="{message}")
     yield
     logger.remove(handler_id)
 
 
 @pytest.fixture
-def caplog(caplog: logging.LogCaptureFixture):
+def caplog(caplog: logging.LogCaptureFixture) -> Iterator[logging.LogCaptureFixture]:
     handler_id = logger.add(
         caplog.handler,
         format="{message}",
