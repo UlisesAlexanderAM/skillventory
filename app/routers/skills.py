@@ -27,11 +27,6 @@ def get_skills(
 ) -> Sequence[models.Skill]:
     skills = crud.get_skills(session=session)
     response.headers["X-Total-Count"] = str(len(skills))
-    response.headers["X-Offset"] = "0"
-    response.headers["X-Limit"] = "15"
-    response.headers["X-Total-Pages"] = "1"
-    if len(skills) == 16:  # noqa
-        response.headers["X-Total-Pages"] = "2"
     return skills
 
 
