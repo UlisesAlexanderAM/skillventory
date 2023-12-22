@@ -31,7 +31,7 @@ from app.database import config
 from app.models import models
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def get_db_session() -> Iterator[sqlmodel.Session]:
     """Gets a database session fixture.
 
