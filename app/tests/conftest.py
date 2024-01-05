@@ -1,4 +1,4 @@
-from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Callable, Iterator
 from typing import Any
 
 import pytest
@@ -65,120 +65,51 @@ def setup_db(get_db_session: sqlmodel.Session) -> Any:
 
 
 @pytest.fixture(scope="session")
-def skill_factory() -> (
-    Iterator[Callable[[str, models.LevelOfConfidence], models.SkillBase]]
-):
-    """Gets a skill factory fixture.
+def factory_skills_models() -> Iterator[Callable[[int], list[models.SkillBase]]]:
+    """Factory to create a list of SkillBase models."""
 
-    Yields:
-        The skill factory.
+    def _skills_models(number_of_skills: int) -> list[models.SkillBase]:
+        skills_names: list[str] = [f"python_{x}" for x in range(number_of_skills)]
+        level_of_confidence: list[models.LevelOfConfidence] = [
+            models.LevelOfConfidence.LEVEL_1 for _ in range(number_of_skills)
+        ]
+        skills: list[models.SkillBase] = []
+        for _ in range(number_of_skills):
+            skills.append(
+                models.SkillBase(
+                    skill_name=skills_names[_],
+                    level_of_confidence=level_of_confidence[_],
+                )
+            )
+        return skills
 
-    This is a session scoped fixture that yields a skill factory.
-    The skill factory is reset after the test finishes executing.
-    """
-
-    def _skill_factory(
-        skill_name: str, level_of_confidence: models.LevelOfConfidence
-    ) -> models.SkillBase:
-        """Creates a Skill model object.
-
-        Args:
-            skill_name: The name of the skill.
-            level_of_confidence: The level of confidence for the skill.
-
-        Returns:
-            The created Skill model object.
-
-        This function takes in a skill name and level of confidence and returns a
-        Skill model object with those values. It is used as a factory function to
-        create Skill objects for testing.
-        """
-        skill = models.SkillBase(
-            skill_name=skill_name, level_of_confidence=level_of_confidence
-        )
-        return skill
-
-    yield _skill_factory
+    yield _skills_models
 
 
 @pytest.fixture(scope="session")
-def skill_1(
-    skill_factory: Callable[[str, models.LevelOfConfidence], models.SkillBase],
-) -> Iterator[models.SkillBase]:
-    """Gets a skill_1 fixture.
+def factory_skills_json() -> Iterator[Callable[[int], list[dict[str, str]]]]:
+    """Factory to create a list of skills in json-like format."""
 
-    Args:
-        skill_factory: The skill factory fixture.
+    def _skills_json(number_of_skills: int) -> list[dict[str, str]]:
+        skills_names: list[str] = [f"python_{x}" for x in range(number_of_skills)]
+        level_of_confidence: list[str] = [
+            models.LevelOfConfidence.LEVEL_1.value for _ in range(number_of_skills)
+        ]
+        skills: list[dict[str, str]] = []
+        for _ in range(number_of_skills):
+            keys = ("skill_name", "level_of_confidence")
+            value = (skills_names[_], level_of_confidence[_])
+            skills.append(dict(zip(keys, value, strict=True)))
+        return skills
 
-    Yields:
-        skill_1: The skill_1 object.
-
-    This is a session scoped fixture that uses the skill factory to create
-    a skill_1 object with name 'python' and confidence level 'LEVEL_2'. It yields
-    the created skill_1 object.
-    """
-    yield skill_factory("python", models.LevelOfConfidence.LEVEL_2)
-
-
-@pytest.fixture(scope="session")
-def skill_2(
-    skill_factory: Callable[[str, models.LevelOfConfidence], models.SkillBase],
-) -> Iterator[models.SkillBase]:
-    """Gets a skill_2 fixture.
-
-    Args:
-        skill_factory: The skill factory fixture.
-
-    Yields:
-        skill_2: The skill_2 object.
-
-    This is a session scoped fixture that uses the skill factory to create
-    a skill_2 object with name 'typescript' and confidence level 'LEVEL_1'. It yields
-    the created skill_2 object.
-    """
-    yield skill_factory("typescript", models.LevelOfConfidence.LEVEL_1)
-
-
-@pytest.fixture(scope="session")
-def skills_json() -> Iterator[Sequence[dict[str, str]]]:
-    """Gets a list of skills in dict/json form.
-
-    Args:
-        skill_1: The skill_1 fixture
-        skill_2: The skill_2 fixture
-
-    Yields:
-        A sequence of skills.
-
-    This is a session scope fixture that uses the skill_1 and skill_2 fixtures
-    to create a sequence of skills dicts/json. It yields the created sequence.
-    """
-    # yield [
-    #     {
-    #         "skill_name": skill_1.skill_name,
-    #         "level_of_confidence": skill_1.level_of_confidence.value,
-    #     },
-    #     {
-    #         "skill_name": skill_2.skill_name,
-    #         "level_of_confidence": skill_2.level_of_confidence.value,
-    #     },
-    # ]
-    skills_names = [f"python_{x}" for x in range(16)]
-    level_of_confidence: list[str] = []
-    skill_json: list[dict[str, str]] = []
-    for _ in range(16):
-        level_of_confidence.append(models.LevelOfConfidence.LEVEL_1.value)
-    for num in range(16):
-        keys = ("skill_name", "level_of_confidence")
-        value = (skills_names[num], level_of_confidence[num])
-        skill_json.append(dict(zip(keys, value, strict=True)))
-    yield skill_json
+    yield _skills_json
 
 
 @pytest.fixture(scope="function")
-def create_one_skill(
-    get_db_session: sqlmodel.Session, skill_1: models.SkillBase
-) -> Iterator[models.SkillBase]:
+def factory_skills_in_db(
+    get_db_session: sqlmodel.Session,
+    factory_skills_models: Callable[[int], list[models.SkillBase]],
+) -> Iterator[Callable[[int], list[models.SkillBase]]]:
     """Creates one skill in the database.
 
     Args:
@@ -192,9 +123,14 @@ def create_one_skill(
     to create one skill in the database. It yields the created
     skill object.
     """
-    _skill_1: models.SkillBase = skill_1
-    crud.create_skill(session=get_db_session, skill=_skill_1)
-    yield _skill_1
+
+    def _skills_in_db(number_of_skills: int) -> list[models.SkillBase]:
+        skills: list[models.SkillBase] = factory_skills_models(number_of_skills)
+        for _ in range(number_of_skills):
+            crud.create_skill(session=get_db_session, skill=skills[_])
+        return skills
+
+    yield _skills_in_db
 
 
 @pytest.fixture
