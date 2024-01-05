@@ -1,28 +1,3 @@
-"""Tests for CRUD operations on skills.
-
-This module contains tests for the CRUD (create, read, update, delete)
-operations for skills using a test database session fixture.
-
-Fixtures:
-- get_db_session: Module scoped session fixture.
-- setup_db: Function scoped setup/teardown fixture.
-- skill_factory: Session scoped skill factory fixture.
-- skill_1: Sample skill fixture.
-- skill_2: Another sample skill fixture.
-
-The tests call the CRUD functions defined in app/data/crud.py and
-validate the results using the fixtures and expected values.
-
-Tests:
-- test_create_skill: Tests creating a new skill.
-- test_get_skill_by_id: Tests getting a skill by ID.
-- test_get_skill_by_name: Tests getting a skill by the skill's name.
-- test_get_skills: Tests getting all skills.
-- test_update_skill_name: Tests updating a skill's name.
-- test_update_skill_level_of_confidence: Tests updating a skill's level of confidence
-- test_delete_skill: Tests deleting a skill.
-"""
-
 from collections.abc import Sequence
 from typing import Any, Literal, Optional
 
