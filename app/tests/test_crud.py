@@ -159,6 +159,38 @@ class TestGetSkills:
             assert skill_db.skill_name == skill_wanted.skill_name
             assert skill_db.level_of_confidence == skill_wanted.level_of_confidence
 
-    @pytest.mark.parametrize("number_of_skills,pages", [(1, 1), (16, 2)])
-    def test_pagination_get_skills(self, number_of_skills: int, pages: int) -> None:
-        pass
+    @pytest.mark.parametrize(
+        "number_of_skills_created, number_of_skills_received", [(1, 1), (16, 15)]
+    )
+    def test_get_skills_page_1(
+        self,
+        get_db_session: sqlmodel.Session,
+        factory_skills_in_db: Callable[[int], list[models.SkillBase]],
+        number_of_skills_created: int,
+        number_of_skills_received: int,
+    ) -> None:
+        factory_skills_in_db(number_of_skills_created)
+
+        skills_db: Sequence[models.Skill] = crud.get_skills(session=get_db_session)
+
+        assert len(skills_db) == number_of_skills_received
+
+    @pytest.mark.parametrize(
+        "number_of_skills_created, number_of_skills_received, offset",
+        [(1, 1, 0), (16, 1, 15)],
+    )
+    def test_get_skill_offset(
+        self,
+        get_db_session: sqlmodel.Session,
+        factory_skills_in_db: Callable[[int], Sequence[models.SkillBase]],
+        number_of_skills_created: int,
+        number_of_skills_received: int,
+        offset: int,
+    ) -> None:
+        factory_skills_in_db(number_of_skills_created)
+
+        skills_db: Sequence[models.Skill] = crud.get_skills(
+            session=get_db_session, offset=offset
+        )
+
+        assert len(skills_db) == number_of_skills_received
