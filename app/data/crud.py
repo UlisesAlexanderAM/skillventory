@@ -46,8 +46,12 @@ def create_skill(session: sqlmodel.Session, skill: models.SkillBase) -> None:
         session.rollback()
 
 
-def get_skills(session: sqlmodel.Session) -> Sequence[models.Skill]:
-    skills: Sequence[models.Skill] = session.exec(sqlmodel.select(models.Skill)).all()
+def get_skills(
+    session: sqlmodel.Session, offset: int = 0, limit: int = 15
+) -> Sequence[models.Skill]:
+    statement = sqlmodel.select(models.Skill).offset(offset).limit(limit)
+    results = session.exec(statement)
+    skills = results.all()
     logger.info("Operation 'get_skills' ended successfully")
     return skills
 
