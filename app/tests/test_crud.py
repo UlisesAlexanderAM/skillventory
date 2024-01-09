@@ -144,16 +144,13 @@ class TestGetSkills:
     @pytest.mark.parametrize("number_of_skills", [0, 1, 2])
     def test_get_skills(
         self,
-        get_db_session: Session,
-        factory_skills_models: Callable[[int], list[models.SkillBase]],
+        get_db_session: sqlmodel.Session,
+        factory_skills_in_db: Callable[[int], list[models.SkillBase]],
         number_of_skills: int,
     ) -> None:
-        skills: list[models.SkillBase] = factory_skills_models(2)
-        skills_wanted: list[models.SkillBase] = []
-
-        for _ in range(number_of_skills):
-            crud.create_skill(session=get_db_session, skill=skills[_])
-            skills_wanted.append(skills[_])
+        skills_wanted: Sequence[models.SkillBase] = factory_skills_in_db(
+            number_of_skills
+        )
         skills_db: Sequence[models.Skill] = crud.get_skills(session=get_db_session)
 
         assert len(skills_db) == number_of_skills
