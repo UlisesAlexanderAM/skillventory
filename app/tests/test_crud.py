@@ -2,7 +2,7 @@ from collections.abc import Sequence, Callable
 from typing import Any, Literal, Optional
 
 import pytest
-from sqlmodel import Session
+import sqlmodel
 
 from app.data import crud
 from app.models import models
@@ -12,7 +12,7 @@ MULTIPLE_SKILLS = 2
 
 @pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
 def test_get_skill_by_id(
-    get_db_session: Session,
+    get_db_session: sqlmodel.Session,
     factory_skills_in_db: Callable[[int], list[models.SkillBase]],
     skill_id: int,
     expected_warning: bool,
@@ -35,7 +35,7 @@ def test_get_skill_by_id(
     "skill_name,expected_warning", [("python_0", False), ("java", True)]
 )
 def test_get_skill_by_name(
-    get_db_session: Session,
+    get_db_session: sqlmodel.Session,
     factory_skills_in_db: Callable[[int], list[models.SkillBase]],
     skill_name: str,
     expected_warning: bool,
@@ -53,7 +53,7 @@ def test_get_skill_by_name(
 
 @pytest.mark.parametrize("expected_exception", [False, True])
 def test_create_skill(
-    get_db_session: Session,
+    get_db_session: sqlmodel.Session,
     factory_skills_models: Callable[[int], list[models.SkillBase]],
     expected_exception: bool,
     caplog: Any,
@@ -74,7 +74,7 @@ def test_create_skill(
 
 @pytest.mark.parametrize("skill_id", [1, 2])
 def test_delete_skill(
-    get_db_session: Session,
+    get_db_session: sqlmodel.Session,
     factory_skills_in_db: Callable[[int], list[models.SkillBase]],
     skill_id: int,
 ) -> None:
@@ -88,7 +88,7 @@ def test_delete_skill(
 
 @pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
 def test_update_skill_name(
-    get_db_session: Session,
+    get_db_session: sqlmodel.Session,
     factory_skills_in_db: Callable[[int], list[models.SkillBase]],
     factory_skills_models: Callable[[int], list[models.SkillBase]],
     skill_id: Literal[1, 2],
@@ -113,7 +113,7 @@ def test_update_skill_name(
 
 @pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
 def test_update_skill_level_of_confidence(
-    get_db_session: Session,
+    get_db_session: sqlmodel.Session,
     factory_skills_in_db: Callable[[int], list[models.SkillBase]],
     factory_skills_models: Callable[[int], list[models.SkillBase]],
     skill_id: int,
