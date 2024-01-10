@@ -7,8 +7,6 @@ import sqlmodel
 from app.data import crud
 from app.models import models
 
-MULTIPLE_SKILLS = 2
-
 
 @pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
 def test_get_skill_by_id(
@@ -19,6 +17,7 @@ def test_get_skill_by_id(
     caplog: Any,
 ) -> None:
     factory_skills_in_db(1)
+
     skill: Optional[models.Skill] = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
@@ -42,6 +41,7 @@ def test_get_skill_by_name(
     caplog: Any,
 ) -> None:
     skill_from_fixture = factory_skills_in_db(1)[0]
+
     skill = crud.get_skill_by_name(session=get_db_session, skill_name=skill_name)
 
     if expected_warning:
@@ -59,10 +59,12 @@ def test_create_skill(
     caplog: Any,
 ) -> None:
     skill_model: models.SkillBase = factory_skills_models(1)[0]
+
     crud.create_skill(session=get_db_session, skill=skill_model)
     skill: Optional[models.Skill] = crud.get_skill_by_name(
         session=get_db_session, skill_name=skill_model.skill_name
     )
+
     assert skill is not None
     assert skill.skill_name == skill_model.skill_name
     assert skill.level_of_confidence == skill_model.level_of_confidence
@@ -82,7 +84,9 @@ def test_delete_skill(
     skill: Optional[models.Skill] = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
+
     crud.delete_skill(session=get_db_session, skill=skill)
+
     assert crud.get_skill_by_id(session=get_db_session, skill_id=skill_id) is None
 
 
@@ -90,25 +94,26 @@ def test_delete_skill(
 def test_update_skill_name(
     get_db_session: sqlmodel.Session,
     factory_skills_in_db: Callable[[int], list[models.SkillBase]],
-    factory_skills_models: Callable[[int], list[models.SkillBase]],
     skill_id: Literal[1, 2],
     expected_warning: bool,
     caplog: Any,
 ) -> None:
     factory_skills_in_db(1)
-    skill_2: models.SkillBase = factory_skills_models(2)[1]
+    new_skill_name: str = "Java"
+
     crud.update_skill_name(
-        session=get_db_session, skill_id=skill_id, new_name=skill_2.skill_name
+        session=get_db_session, skill_id=skill_id, new_name=new_skill_name
     )
     skill_updated: Optional[models.Skill] = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
+
     if expected_warning:
         assert f"The skill with id {skill_id} doesn't exist" in caplog.text
     else:
         assert skill_updated is not None
         assert skill_updated.skill_id == skill_id
-        assert skill_updated.skill_name == skill_2.skill_name
+        assert skill_updated.skill_name == new_skill_name
 
 
 @pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
@@ -151,10 +156,10 @@ class TestGetSkills:
         skills_wanted: Sequence[models.SkillBase] = factory_skills_in_db(
             number_of_skills
         )
+
         skills_db: Sequence[models.Skill] = crud.get_skills(session=get_db_session)
 
         assert len(skills_db) == number_of_skills
-
         for skill_wanted, skill_db in zip(skills_wanted, skills_db, strict=True):
             assert skill_db.skill_name == skill_wanted.skill_name
             assert skill_db.level_of_confidence == skill_wanted.level_of_confidence
