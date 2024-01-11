@@ -4,8 +4,12 @@ run-name: Building docker image
 on:
   push:
     branches: ["main"]
+    paths-ignore:
+      - "docs/**"
   pull_request:
     branches: ["main"]
+    paths-ignore:
+      - "docs/**"
 
 jobs:
   build:
