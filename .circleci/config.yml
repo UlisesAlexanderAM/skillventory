@@ -9,5 +9,5 @@ workflows:
       - python/test:
           pkg-manager: poetry
           test-tool: pytest
-          test-tool-args: "--cov"
-          version: "3.11"
+          test-tool-args: '--cov'
+          version: '3.11'
