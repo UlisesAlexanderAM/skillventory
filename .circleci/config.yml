@@ -17,7 +17,7 @@ jobs:
           name: create directory for tests reports
       - run:
           command: |
-            poetry run pytest --junitxml=test-results/junit.xml --cov-report xml:coverage.xml --cov=app app/tests/
+            poetry run pytest --junitxml=test-results/junit.xml --cov-report xml:coverage.xml --cov=app tests/
           name: Generate test report
       - store_test_results:
           path: test-results
