@@ -2,6 +2,17 @@ version: 2.1
 
 orbs:
   python: circleci/python@1.5.0
+  coverage-reporter: codacy/coverage-reporter@13.15.0
+
+jobs:
+  codacy-coverage-report:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - checkout
+      - coverage-reporter/send_report:
+          coverage-reports: report.xml
+          project-token: $CODACY_PROJECT_TOKEN
 
 workflows:
   testing:
@@ -11,3 +22,7 @@ workflows:
           test-tool: pytest
           test-tool-args: '--cov'
           version: '3.11'
+      - codacy-coverage-report:
+          requires: 
+            - python/test
+      
