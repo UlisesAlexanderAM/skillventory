@@ -7,6 +7,10 @@ on:
       - main
     paths-ignore:
       - "docs/**"
+      - "README.md"
+      - "mkdocs.yml"
+      - ".pre-commit-config.yaml"
+      - ".circleci/**"
 
 jobs:
   testing:
@@ -23,4 +27,4 @@ jobs:
       - name: Install dependencies
         run: poetry install
       - name: Test with pytest
-        run: poetry run pytest --cov
+        run: poetry run pytest
