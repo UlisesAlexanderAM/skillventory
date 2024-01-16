@@ -9,7 +9,7 @@ on:
 jobs:
   on-succes:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == "success" }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -22,7 +22,7 @@ jobs:
           tags: personal-inventory:latest
   on-failure:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == "failure" }}
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     env:
       EVENT: ${{ github.event.workflow_run.event }}
     steps:
