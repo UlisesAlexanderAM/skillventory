@@ -1,5 +1,7 @@
 # Personal inventory
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/605a85c99203416ba5a633e4db8e599d)](https://app.codacy.com/gh/UlisesAlexanderAM/Personal-inventory?utm_source=github.com&utm_medium=referral&utm_content=UlisesAlexanderAM/Personal-inventory&utm_campaign=Badge_Grade)
+
 [Documentation](https://ulisesalexanderam.github.io/Personal-inventory)
 [Source code](https://github.com/UlisesAlexanderAM/Personal-inventory)
 
