@@ -2,19 +2,14 @@ name: Docker Image CI
 run-name: Building docker image
 
 on:
-  push:
-    branches: ["main"]
-    paths-ignore:
-      - "docs/**"
-  pull_request:
-    branches: ["main"]
-    paths-ignore:
-      - "docs/**"
+  workflow_run:
+    workflows: ["Test Python with poetry"]
+    types: [completed]
 
 jobs:
-  build:
+  on-succes:
     runs-on: ubuntu-latest
-
+    if: ${{ github.event.workflow_run.conclusion == "success" }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -25,3 +20,11 @@ jobs:
         with:
           context: .
           tags: personal-inventory:latest
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == "failure" }}
+    env:
+      EVENT: ${{ github.event.workflow_run.event }}
+    steps:
+      - run: echo 'The trigering event failed:'
+      - run: echo $EVENT
