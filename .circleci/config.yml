@@ -8,6 +8,7 @@ jobs:
   testing-and-generating-report:
     docker:
       - image: cimg/python:3.11
+    resource_class: small
     steps:
       - checkout
       - python/install-packages:
@@ -26,9 +27,73 @@ jobs:
           root: .
           paths:
             - coverage.xml
+  setup:
+    docker:
+      - image: cimg/python:3.11
+    resource_class: small
+    steps:
+      - checkout
+      - python/install-packages:
+          args: "--only linting"
+          pkg-manager: poetry
+      - persist_to_workspace:
+          root: .
+          paths:
+            - "app"
+            - "tests"
+            - "pyproject.toml"
+  linting-ruff:
+    docker:
+      - image: cimg/python:3.11
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: ruff linting
+          command: |
+            ruff --fix
+      - run:
+          name: ruff formatting
+          command: |
+            ruff format
+  linting-bandit:
+    docker:
+      - image: cimg/python:3.11
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: security linting with bandit
+          command: |
+            bandit -c pyproject.toml -r app/
+  linting-mypy:
+    docker:
+      - image: cimg/python:3.11
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: mypy type checking
+          command: |
+            mypy -p app
+  linting-pytype:
+    docker:
+      - image: cimg/python:3.11
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: pytype type checking
+          command: |
+            pytype
   codacy-coverage-report:
     docker:
       - image: circleci/openjdk:8-jdk
+    resource_class: small
     steps:
       - attach_workspace:
           at: .
@@ -39,7 +104,25 @@ jobs:
 workflows:
   testing:
     jobs:
-      - testing-and-generating-report
+      - setup
+      - linting-ruff:
+          requires:
+            - setup
+      - linting-bandit:
+          requires:
+            - setup
+      - linting-mypy:
+          requires:
+            - setup
+      - linting-pytype:
+          requires:
+            - setup
+      - testing-and-generating-report:
+          requires:
+            - linting-ruff
+            - linting-bandit
+            - linting-mypy
+            - linting-pytype
       - codacy-coverage-report:
           requires:
             - testing-and-generating-report
