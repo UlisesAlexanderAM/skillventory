@@ -11,6 +11,9 @@ jobs:
     resource_class: small
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-testing-{{ checsum "poetry.lock" }}
       - python/install-packages:
           args: "--with test"
           pkg-manager: poetry
@@ -27,12 +30,19 @@ jobs:
           root: .
           paths:
             - coverage.xml
+      - save_cache:
+          key: v1-testing-{{ checksum "poetry.lock" }}
+          paths:
+            - ".venv"
   setup:
     docker:
       - image: cimg/python:3.11
     resource_class: small
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-linting-{{ checsum "poetry.lock" }}
       - python/install-packages:
           args: "--only linting"
           pkg-manager: poetry
@@ -42,6 +52,11 @@ jobs:
             - "app"
             - "tests"
             - "pyproject.toml"
+            - "poetry.lock"
+      - save_cache:
+          key: v1-linting-{{ checksum "poetry.lock" }}
+          paths:
+            - ".venv"
   linting-ruff:
     docker:
       - image: cimg/python:3.11
@@ -49,6 +64,12 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - restore_cache:
+          keys:
+            - v1-linting-{{ checsum "poetry.lock" }}
+      - python/install-packages:
+          args: "--only linting"
+          pkg-manager: poetry
       - run:
           name: ruff linting
           command: |
@@ -57,6 +78,10 @@ jobs:
           name: ruff formatting
           command: |
             ruff format
+      - save_cache:
+          key: v1-linting-{{ checksum "poetry.lock" }}
+          paths:
+            - ".venv"
   linting-bandit:
     docker:
       - image: cimg/python:3.11
@@ -64,10 +89,20 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - restore_cache:
+          keys:
+            - v1-linting-{{ checsum "poetry.lock" }}
+      - python/install-packages:
+          args: "--only linting"
+          pkg-manager: poetry
       - run:
           name: security linting with bandit
           command: |
             bandit -c pyproject.toml -r app/
+      - save_cache:
+          key: v1-linting-{{ checksum "poetry.lock" }}
+          paths:
+            - ".venv"
   linting-mypy:
     docker:
       - image: cimg/python:3.11
@@ -75,10 +110,20 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - restore_cache:
+          keys:
+            - v1-linting-{{ checsum "poetry.lock" }}
+      - python/install-packages:
+          args: "--only linting"
+          pkg-manager: poetry
       - run:
           name: mypy type checking
           command: |
             mypy -p app
+      - save_cache:
+          key: v1-linting-{{ checksum "poetry.lock" }}
+          paths:
+            - ".venv"
   linting-pytype:
     docker:
       - image: cimg/python:3.11
@@ -86,10 +131,20 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - restore_cache:
+          keys:
+            - v1-linting-{{ checsum "poetry.lock" }}
+      - python/install-packages:
+          args: "--only linting"
+          pkg-manager: poetry
       - run:
           name: pytype type checking
           command: |
             pytype
+      - save_cache:
+          key: v1-linting-{{ checksum "poetry.lock" }}
+          paths:
+            - ".venv"
   codacy-coverage-report:
     docker:
       - image: circleci/openjdk:8-jdk
