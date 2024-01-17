@@ -13,7 +13,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-testing-{{ checsum "poetry.lock" }}
+            - v1-testing-{{ checksum "poetry.lock" }}
       - python/install-packages:
           args: "--with test"
           pkg-manager: poetry
@@ -42,7 +42,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-linting-{{ checsum "poetry.lock" }}
+            - v1-linting-{{ checksum "poetry.lock" }}
       - python/install-packages:
           args: "--only linting"
           pkg-manager: poetry
@@ -66,7 +66,7 @@ jobs:
           at: .
       - restore_cache:
           keys:
-            - v1-linting-{{ checsum "poetry.lock" }}
+            - v1-linting-{{ checksum "poetry.lock" }}
       - python/install-packages:
           args: "--only linting"
           pkg-manager: poetry
@@ -91,7 +91,7 @@ jobs:
           at: .
       - restore_cache:
           keys:
-            - v1-linting-{{ checsum "poetry.lock" }}
+            - v1-linting-{{ checksum "poetry.lock" }}
       - python/install-packages:
           args: "--only linting"
           pkg-manager: poetry
@@ -112,7 +112,7 @@ jobs:
           at: .
       - restore_cache:
           keys:
-            - v1-linting-{{ checsum "poetry.lock" }}
+            - v1-linting-{{ checksum "poetry.lock" }}
       - python/install-packages:
           args: "--only linting"
           pkg-manager: poetry
@@ -133,7 +133,7 @@ jobs:
           at: .
       - restore_cache:
           keys:
-            - v1-linting-{{ checsum "poetry.lock" }}
+            - v1-linting-{{ checksum "poetry.lock" }}
       - python/install-packages:
           args: "--only linting"
           pkg-manager: poetry
