@@ -57,7 +57,6 @@ no_implicit_reexport = true
 disallow_untyped_defs = true
 
 [tool.ruff]
-extend-exclude = ["tests"]
 preview = true
 
 [tool.ruff.lint]
@@ -101,7 +100,6 @@ extend-select = [
               "PLR1733", # unnecessary-dict-index-lookup
               "PLR1736", # unnecessary-list-index-lookup
               "PLR6201", # literal-membership
-              "PLR6301", # no-self-use
               "PLW1501", # bad-open-mode
               "PLW1514", # unspecified-encoding
               "PLW3201", # bad-dunder-method-name
@@ -113,6 +111,9 @@ extend-select = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/*" = ["S101","PLR0913", "PLR0917", "PLR6301"]
 
 [tool.pydantic-mypy]
 init_forbid_extra = true
