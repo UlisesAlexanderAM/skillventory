@@ -10,37 +10,20 @@ from app import main
 client = testclient.TestClient(app=main.app)
 
 
+@pytest.fixture()
+def one_json_skill(
+    factory_skills_json: Callable[[int], Sequence[dict[str, str]]],
+) -> dict[str, str]:
+    return factory_skills_json(1)[0]
+
+
+@pytest.fixture()
+def _post_one_skill(one_json_skill: dict[str, str]) -> None:
+    skill = one_json_skill
+    client.post("/skills", json=skill)
+
+
 @pytest.mark.usefixtures("override_get_db_session")
-@pytest.mark.parametrize(
-    ("skill_id", "expected_status_code"),
-    [(1, status.HTTP_200_OK), (2, status.HTTP_404_NOT_FOUND)],
-)
-def test_get_skill_by_id(
-    skill_id: int,
-    expected_status_code: int,
-    factory_skills_json: Callable[[int], list[dict[str, str]]],
-) -> None:
-    client.post("/skills", json=factory_skills_json(1)[0])
-    response: Response = client.get(f"/skills/id/{skill_id}")
-
-    assert response.status_code == expected_status_code
-
-
-@pytest.mark.parametrize(
-    ("skill_name", "expected_status_code"),
-    [("python_0", status.HTTP_200_OK), ("java", status.HTTP_404_NOT_FOUND)],
-)
-def test_get_skill_by_name(
-    skill_name: str,
-    expected_status_code: int,
-    factory_skills_json: Callable[[int], list[dict[str, str]]],
-) -> None:
-    client.post("/skills", json=factory_skills_json(1)[0])
-    response: Response = client.get(f"/skills/name/{skill_name}")
-
-    assert response.status_code == expected_status_code
-
-
 @pytest.mark.parametrize(
     ("expected_status_code", "expected_json", "num_skills"),
     [
@@ -75,3 +58,35 @@ def test_get_skills(
     assert response.status_code == status.HTTP_200_OK
     assert len(response.json()) == num_skills
     assert response.headers["X-Total-Count"] == str(num_skills)
+
+
+@pytest.mark.usefixtures("_post_one_skill")
+class TestGetSkillById:
+    @pytest.mark.parametrize(
+        ("skill_id", "expected_status_code"),
+        [(1, status.HTTP_200_OK), (2, status.HTTP_404_NOT_FOUND)],
+    )
+    def test_status_code(
+        self,
+        skill_id: int,
+        expected_status_code: int,
+    ) -> None:
+        response: Response = client.get(f"/skills/id/{skill_id}")
+
+        assert response.status_code == expected_status_code
+
+
+@pytest.mark.usefixtures("_post_one_skill")
+class TestGetSkillByName:
+    @pytest.mark.parametrize(
+        ("skill_name", "expected_status_code"),
+        [("python_0", status.HTTP_200_OK), ("java", status.HTTP_404_NOT_FOUND)],
+    )
+    def test_status_code(
+        self,
+        skill_name: str,
+        expected_status_code: int,
+    ) -> None:
+        response: Response = client.get(f"/skills/name/{skill_name}")
+
+        assert response.status_code == expected_status_code
