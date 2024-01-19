@@ -8,7 +8,7 @@ from app.data import crud
 from app.models import models
 
 
-@pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
+@pytest.mark.parametrize(("skill_id", "expected_warning"), [(1, False), (2, True)])
 def test_get_skill_by_id(
     get_db_session: sqlmodel.Session,
     factory_skills_in_db: Callable[[int], list[models.SkillBase]],
@@ -31,7 +31,7 @@ def test_get_skill_by_id(
 
 
 @pytest.mark.parametrize(
-    "skill_name,expected_warning", [("python_0", False), ("java", True)]
+    ("skill_name", "expected_warning"), [("python_0", False), ("java", True)]
 )
 def test_get_skill_by_name(
     get_db_session: sqlmodel.Session,
@@ -90,7 +90,7 @@ def test_delete_skill(
     assert crud.get_skill_by_id(session=get_db_session, skill_id=skill_id) is None
 
 
-@pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
+@pytest.mark.parametrize(("skill_id", "expected_warning"), [(1, False), (2, True)])
 def test_update_skill_name(
     get_db_session: sqlmodel.Session,
     factory_skills_in_db: Callable[[int], list[models.SkillBase]],
@@ -116,7 +116,7 @@ def test_update_skill_name(
         assert skill_updated.skill_name == new_skill_name
 
 
-@pytest.mark.parametrize("skill_id,expected_warning", [(1, False), (2, True)])
+@pytest.mark.parametrize(("skill_id", "expected_warning"), [(1, False), (2, True)])
 def test_update_skill_level_of_confidence(
     get_db_session: sqlmodel.Session,
     factory_skills_in_db: Callable[[int], list[models.SkillBase]],
@@ -145,6 +145,7 @@ def test_update_skill_level_of_confidence(
         assert skill_updated.level_of_confidence == skill_2.level_of_confidence
 
 
+@pytest.mark.usefixtures("get_db_session")
 class TestGetSkills:
     @pytest.mark.parametrize("number_of_skills", [0, 1, 2])
     def test_get_skills(
@@ -165,7 +166,7 @@ class TestGetSkills:
             assert skill_db.level_of_confidence == skill_wanted.level_of_confidence
 
     @pytest.mark.parametrize(
-        "number_of_skills_created, number_of_skills_received", [(1, 1), (16, 15)]
+        ("number_of_skills_created", "number_of_skills_received"), [(1, 1), (16, 15)]
     )
     def test_get_skills_page_1(
         self,
@@ -181,7 +182,7 @@ class TestGetSkills:
         assert len(skills_db) == number_of_skills_received
 
     @pytest.mark.parametrize(
-        "number_of_skills_created, number_of_skills_received, offset",
+        ("number_of_skills_created", "number_of_skills_received", "offset"),
         [(1, 1, 0), (16, 1, 15)],
     )
     def test_get_skill_offset(

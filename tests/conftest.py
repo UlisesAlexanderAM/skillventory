@@ -12,7 +12,7 @@ from app.database import config
 from app.models import models
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def get_db_session() -> Iterator[sqlmodel.Session]:
     """Gets a database session fixture.
 
@@ -26,7 +26,7 @@ def get_db_session() -> Iterator[sqlmodel.Session]:
         yield session
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def override_get_db_session() -> Any:
     """Override get_db_session dependecy.
 
@@ -46,7 +46,7 @@ def override_get_db_session() -> Any:
         config.Base.metadata.drop_all(bind=config.testing_engine)
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def setup_db(get_db_session: sqlmodel.Session) -> Any:
     """Sets up and tears down the database for tests.
 
@@ -65,7 +65,7 @@ def setup_db(get_db_session: sqlmodel.Session) -> Any:
 
 
 @pytest.fixture(scope="session")
-def factory_skills_models() -> Iterator[Callable[[int], list[models.SkillBase]]]:
+def factory_skills_models() -> Callable[[int], list[models.SkillBase]]:
     """Factory to create a list of SkillBase models."""
 
     def _skills_models(number_of_skills: int) -> list[models.SkillBase]:
@@ -83,11 +83,11 @@ def factory_skills_models() -> Iterator[Callable[[int], list[models.SkillBase]]]
             )
         return skills
 
-    yield _skills_models
+    return _skills_models
 
 
 @pytest.fixture(scope="session")
-def factory_skills_json() -> Iterator[Callable[[int], list[dict[str, str]]]]:
+def factory_skills_json() -> Callable[[int], list[dict[str, str]]]:
     """Factory to create a list of skills in json-like format."""
 
     def _skills_json(number_of_skills: int) -> list[dict[str, str]]:
@@ -102,14 +102,14 @@ def factory_skills_json() -> Iterator[Callable[[int], list[dict[str, str]]]]:
             skills.append(dict(zip(keys, value, strict=True)))
         return skills
 
-    yield _skills_json
+    return _skills_json
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def factory_skills_in_db(
     get_db_session: sqlmodel.Session,
     factory_skills_models: Callable[[int], list[models.SkillBase]],
-) -> Iterator[Callable[[int], list[models.SkillBase]]]:
+) -> Callable[[int], list[models.SkillBase]]:
     """Creates one skill in the database.
 
     Args:
@@ -130,18 +130,18 @@ def factory_skills_in_db(
             crud.create_skill(session=get_db_session, skill=skills[_])
         return skills
 
-    yield _skills_in_db
+    return _skills_in_db
 
 
-@pytest.fixture
-def reportlog(pytestconfig: Any):
+@pytest.fixture()
+def reportlog(pytestconfig: Any):  # noqa: PT004
     logging_plugin = pytestconfig.pluginmanager.getplugin("logging-plugin")
     handler_id = logger.add(logging_plugin.report_handler, format="{message}")
     yield
     logger.remove(handler_id)
 
 
-@pytest.fixture
+@pytest.fixture()
 def caplog(caplog: logging.LogCaptureFixture) -> Iterator[logging.LogCaptureFixture]:
     handler_id = logger.add(
         caplog.handler,

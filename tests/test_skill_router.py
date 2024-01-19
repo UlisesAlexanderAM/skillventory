@@ -12,7 +12,7 @@ client = testclient.TestClient(app=main.app)
 
 @pytest.mark.usefixtures("override_get_db_session")
 @pytest.mark.parametrize(
-    "skill_id,expected_status_code",
+    ("skill_id", "expected_status_code"),
     [(1, status.HTTP_200_OK), (2, status.HTTP_404_NOT_FOUND)],
 )
 def test_get_skill_by_id(
@@ -27,7 +27,7 @@ def test_get_skill_by_id(
 
 
 @pytest.mark.parametrize(
-    "skill_name,expected_status_code",
+    ("skill_name", "expected_status_code"),
     [("python_0", status.HTTP_200_OK), ("java", status.HTTP_404_NOT_FOUND)],
 )
 def test_get_skill_by_name(
@@ -42,7 +42,7 @@ def test_get_skill_by_name(
 
 
 @pytest.mark.parametrize(
-    "expected_status_code,expected_json, num_skills",
+    ("expected_status_code", "expected_json", "num_skills"),
     [
         (status.HTTP_201_CREATED, {"message": "Skill added successfully"}, 1),
         (status.HTTP_409_CONFLICT, {"detail": "Skill already added"}, 2),
