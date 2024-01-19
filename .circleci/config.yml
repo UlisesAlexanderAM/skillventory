@@ -1,7 +1,6 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@2.1.1
   coverage-reporter: codacy/coverage-reporter@13.15.0
 
 jobs:
@@ -14,16 +13,17 @@ jobs:
       - restore_cache:
           keys:
             - v1-testing-{{ checksum "poetry.lock" }}
-      - python/install-packages:
-          args: "--with test"
-          pkg-manager: poetry
       - run:
-          command: mkdir test-results
+          name: install packages
+          command: |
+            poetry install --no-root --with test
+      - run:
           name: create directory for tests reports
+          command: mkdir test-results
       - run:
+          name: Generate test report
           command: |
             poetry run pytest --junitxml=test-results/junit.xml --cov-report xml:coverage.xml --cov=app tests/
-          name: Generate test report
       - store_test_results:
           path: test-results
       - persist_to_workspace:
@@ -43,9 +43,10 @@ jobs:
       - restore_cache:
           keys:
             - v1-linting-{{ checksum "poetry.lock" }}
-      - python/install-packages:
-          args: "--only linting"
-          pkg-manager: poetry
+      - run:
+          name: Install packages
+          command: |
+            poetry install --no-root --only linting
       - persist_to_workspace:
           root: .
           paths:
@@ -67,9 +68,10 @@ jobs:
       - restore_cache:
           keys:
             - v1-linting-{{ checksum "poetry.lock" }}
-      - python/install-packages:
-          args: "--only linting"
-          pkg-manager: poetry
+      - run:
+          name: Install packages
+          command: |
+            poetry install --no-root --only linting
       - run:
           name: ruff linting
           command: |
@@ -92,9 +94,10 @@ jobs:
       - restore_cache:
           keys:
             - v1-linting-{{ checksum "poetry.lock" }}
-      - python/install-packages:
-          args: "--only linting"
-          pkg-manager: poetry
+      - run:
+          name: Install packages
+          command: |
+            poetry install --no-root --only linting
       - run:
           name: security linting with bandit
           command: |
@@ -113,9 +116,10 @@ jobs:
       - restore_cache:
           keys:
             - v1-linting-{{ checksum "poetry.lock" }}
-      - python/install-packages:
-          args: "--only linting"
-          pkg-manager: poetry
+      - run:
+          name: Install packages
+          command: |
+            poetry install --no-root --only linting
       - run:
           name: mypy type checking
           command: |
@@ -134,9 +138,10 @@ jobs:
       - restore_cache:
           keys:
             - v1-linting-{{ checksum "poetry.lock" }}
-      - python/install-packages:
-          args: "--only linting"
-          pkg-manager: poetry
+      - run:
+          name: Install packages
+          command: |
+            poetry install --no-root --only linting
       - run:
           name: pytype type checking
           command: |
