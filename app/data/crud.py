@@ -9,8 +9,6 @@ from sqlalchemy import exc
 
 from app.models import models
 
-logger.add("test.log")
-
 
 def get_skill_by_id(session: sqlmodel.Session, skill_id: int) -> Optional[models.Skill]:
     skill: Optional[models.Skill] = session.get(models.Skill, skill_id)
