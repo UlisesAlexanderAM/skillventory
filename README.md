@@ -30,7 +30,7 @@ example.
 This project have some objectives:
 
 - Help me build experience in non-trivial code projects
-- Help to know me, and however use this API, better.
+- Help to know me, and whoever use this API, better.
 - Track skills, knowledge and competences.
 - Help to prioritize the learning/practice of skills.
 
