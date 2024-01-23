@@ -6,6 +6,7 @@ from fastapi import status, testclient
 from httpx import Response
 
 from app import main
+from app.models import models
 
 client = testclient.TestClient(app=main.app)
 
@@ -90,3 +91,13 @@ class TestGetSkillByName:
         response: Response = client.get(f"/skills/name/{skill_name}")
 
         assert response.status_code == expected_status_code
+
+    def test_content(self) -> None:
+        skill_name = "python_0"
+        response = client.get(f"/skills/name/{skill_name}")
+
+        assert response.json() == {
+            "skill_id": 1,
+            "skill_name": skill_name,
+            "level_of_confidence": models.LevelOfConfidence.LEVEL_1.value,
+        }
