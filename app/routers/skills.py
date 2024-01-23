@@ -1,7 +1,7 @@
 """Module that defines the routes related to skills/knowledge/competence."""
 
 from collections.abc import Sequence
-from typing import Annotated, Dict, Optional
+from typing import Annotated, Any, Dict, Optional
 
 import fastapi as fa
 import sqlmodel
@@ -80,3 +80,31 @@ def get_skill_by_name(
             detail=f"Skill with name '{skill_name}' not found",
         )
     return skill_db
+
+
+@router.patch(
+    "/{skill_id}", status_code=status.HTTP_200_OK, response_model=models.Skill
+)
+def update_skill(
+    session: Annotated[sqlmodel.Session, fa.Depends(deps.get_db_session)],
+    skill_id: Annotated[int, fa.Path(title="ID of the skill to update")],
+    skill: Annotated[
+        models.SkillBase,
+        fa.Body(title="Body of the modified skill"),
+    ],
+) -> Any:
+    skill_to_update = crud.get_skill_by_id(session=session, skill_id=skill_id)
+    skill_name_received = skill.skill_name
+    if skill_to_update is None:
+        raise fa.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Skill with Id {skill_id} not found",
+        )
+    if (
+        skill_to_update.skill_name != skill_name_received
+        and skill_name_received is not None
+    ):
+        crud.update_skill_name(
+            session=session, skill_id=skill_id, new_name=skill_name_received
+        )
+    return crud.get_skill_by_id(session=session, skill_id=skill_id)
