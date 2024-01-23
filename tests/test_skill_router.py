@@ -101,3 +101,36 @@ class TestGetSkillByName:
             "skill_name": skill_name,
             "level_of_confidence": models.LevelOfConfidence.LEVEL_1.value,
         }
+
+
+@pytest.mark.usefixtures("_post_one_skill")
+class TestUpdateSkillName:
+    @pytest.fixture()
+    def skill_name_modified(
+        self, factory_skills_json: Callable[[int], list[dict[str, str]]]
+    ) -> dict[str, str]:
+        original_skill = factory_skills_json(1)[0]
+        skill_modified = original_skill.copy()
+        skill_modified["skill_name"] = "Clojure"
+        return skill_modified
+
+    @pytest.mark.parametrize(
+        ("skill_id", "expected_status_code"),
+        [(1, status.HTTP_200_OK), (2, status.HTTP_404_NOT_FOUND)],
+    )
+    def test_update_name_status_code(
+        self,
+        skill_id: int,
+        expected_status_code: int,
+        skill_name_modified: dict[str, str],
+    ) -> None:
+        response = client.patch(f"/skills/{skill_id}", json=skill_name_modified)
+
+        assert response.status_code == expected_status_code
+
+    def test_content(self, skill_name_modified: dict[str, str]) -> None:
+        skill_id = 1
+        response = client.patch(f"/skills/{skill_id}", json=skill_name_modified)
+        skill_received = skill_name_modified.copy()
+        skill_received.update({"skill_id": 1})  # noqa: dict-item
+        assert response.json() == skill_received
