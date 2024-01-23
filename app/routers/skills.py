@@ -5,7 +5,7 @@ from typing import Annotated, Dict, Optional
 
 import fastapi as fa
 import sqlmodel
-from fastapi import responses
+from fastapi import responses, status
 
 from app.data import crud
 from app.data import dependencies as deps
@@ -18,9 +18,7 @@ router: fa.APIRouter = fa.APIRouter(
 )
 
 
-@router.get(
-    "/", status_code=fa.status.HTTP_200_OK, response_model=Sequence[models.Skill]
-)
+@router.get("/", status_code=status.HTTP_200_OK, response_model=Sequence[models.Skill])
 def get_skills(
     session: Annotated[sqlmodel.Session, fa.Depends(deps.get_db_session)],
     response: fa.Response,
@@ -32,7 +30,7 @@ def get_skills(
 
 @router.post(
     "/",
-    status_code=fa.status.HTTP_201_CREATED,
+    status_code=status.HTTP_201_CREATED,
     responses={409: {"description": "Conflicting request"}},
     response_class=responses.JSONResponse,
 )
@@ -44,12 +42,12 @@ def post_skill(
         crud.create_skill(session=session, skill=skill)
         return {"message": "Skill added successfully"}
     raise fa.HTTPException(
-        status_code=fa.status.HTTP_409_CONFLICT, detail="Skill already added"
+        status_code=status.HTTP_409_CONFLICT, detail="Skill already added"
     )
 
 
 @router.get(
-    "/id/{skill_id}", status_code=fa.status.HTTP_200_OK, response_model=models.Skill
+    "/id/{skill_id}", status_code=status.HTTP_200_OK, response_model=models.Skill
 )
 def get_skill_by_id(
     session: Annotated[sqlmodel.Session, fa.Depends(deps.get_db_session)],
@@ -60,14 +58,14 @@ def get_skill_by_id(
     )
     if skill_db is None:
         raise fa.HTTPException(
-            status_code=fa.status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Skill with id {skill_id} not found",
         )
     return skill_db
 
 
 @router.get(
-    "/name/{skill_name}", status_code=fa.status.HTTP_200_OK, response_model=models.Skill
+    "/name/{skill_name}", status_code=status.HTTP_200_OK, response_model=models.Skill
 )
 def get_skill_by_name(
     session: Annotated[sqlmodel.Session, fa.Depends(deps.get_db_session)],
@@ -78,7 +76,7 @@ def get_skill_by_name(
     )
     if skill_db is None:
         raise fa.HTTPException(
-            status_code=fa.status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Skill with name '{skill_name}' not found",
         )
     return skill_db
