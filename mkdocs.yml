@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
-site_name: Personal Inventory's Docs
+site_name: Skillventory Documentation
 theme:
   name: material
   language: en

@@ -97,11 +97,6 @@ docker run -p <Deployment_Host_Port>:80 personal-inventory
 Where the `Deployment_Host_Port` is the port in the deployment host from where
 you give access to the container.
 
-## Usage
-
-After getting the server up, you can start making requests using your favorite tool,
-or connect using your favorite frontend framework.
-
 ## 🎯 Roadmap
 
 Here is a little roadmap of what I want to implement and what its already implemented.
