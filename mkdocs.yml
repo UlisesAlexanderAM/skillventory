@@ -33,7 +33,10 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
   - admonition
+  - def_list
   - pymdownx.details
   - pymdownx.superfences
   - pymdownx.snippets

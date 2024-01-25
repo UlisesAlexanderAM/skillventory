@@ -1,40 +1,37 @@
-# Welcome to Personal Inventory
+# Skillventory
 
-[Documentation](https://ulisesalexanderam.github.io/Personal-inventory)
-[Source code](https://github.com/UlisesAlexanderAM/Personal-inventory)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/UlisesAlexanderAM/skillventory/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/UlisesAlexanderAM/skillventory/tree/main)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/3da0d7410cef405ea37f2c1aae0bd803)](https://app.codacy.com/gh/UlisesAlexanderAM/skillventory/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/3da0d7410cef405ea37f2c1aae0bd803)](https://app.codacy.com/gh/UlisesAlexanderAM/skillventory/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+![GitHub License](https://img.shields.io/github/license/UlisesAlexanderAM/skillventory)
 
-Originally a web app to use as a personal inventory.
-Now an API to use, create, and manage a personal inventory.
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/UlisesAlexanderAM/skillventory/main.svg)](https://results.pre-commit.ci/latest/github/UlisesAlexanderAM/skillventory/main)
+![Testing with poetry workflow](https://github.com/UlisesAlexanderAM/skillventory/actions/workflows/testing.yml/badge.svg)
+![Build docker image workflow](https://github.com/UlisesAlexanderAM/skillventory/actions/workflows/build-docker-image.yml/badge.svg)
+
+
+[📘 Documentation](https://ulisesalexanderam.github.io/skillventory)
+[💻 Source code](https://github.com/UlisesAlexanderAM/skillventory)
+
+An API to manage a personal inventory.
 
 ???+ info "What's a personal inventory?"
      In this case a personal inventory is a set of skills,
      knowledge and competences that a person has or is
      interest in obtain.
 
-This project primary focus is as a self-hosted API for experimentation and personal
-use but as I don't want to delimitate the user, I add a dockerfile and a compose
-file so you can deploy it on the cloud.
+## 💡 Motivation
 
-## From a web app to an API
+While taking a course about [*Career Plan Design and Development*](https://platzi.com/cursos/plan-carrera/) in Platzi.
+I came access this concept of a Personal Inventory and how this is part of
+the self-knowledge toolkit. I wanted to use it but I wasn't happy with
+my first iteration using worksheets. So I decide to build it as a webapp,
+then I decide to first build the API. In the future I'll add one or more
+front-end as demos.
 
-I came to the conclusion that at the moment I know more about backend development
-than frontend development. Another reason is that if the user want to do some highly
-personalized websites to show their personal inventories I shouldn't restrict them
-to follow my choices of how to display and interact with the personal inventory.
+## 🚀 Quickstart
 
-Probably I'll use simple templates with ninja for my personal use and as an simple
-example.
-
-## Objectives of the project
-
-This project have some objectives:
-
-- Help me build experience in non-trivial code projects
-- Help to know me, and whoever use this API, better.
-- Track skills, knowledge and competences.
-- Help to prioritize the learning/practice of skills.
-
-## Get the server up
+### Clone the repository
 
 The first thing you need to do to use this tool is get the source code from the repository.
 
@@ -94,7 +91,128 @@ The first thing you need to do to use this tool is get the source code from the 
     Where the `Deployment_Host_Port` is the port in the deployment host from where
     you give access to the container.
 
-## Usage
 
-After getting the server up, you can start making requests using your favorite tool,
-or connect using your favorite frontend framework.
+## 🎯 Roadmap
+
+Here is a little roadmap of what I want to implement and what its already implemented.
+
+- [x] Complete CRUD API (functions that interact with the DB)
+- [ ] Rest API for the personal inventory
+- [ ] Upload Docker image to Docker Hub
+- [ ] Host the API in the web
+- [ ] Simple demo web client
+- [ ] Simple gtk+ desktop client
+
+## 🙌 Contributing
+
+I really appreciate any kind of contributions but I list how you can contribute
+in some specific ways. **Skillventory** is currently develop and maintain by
+[Ulises Alexander AM](https://github.com/UlisesAlexanderAM). I'm looking for
+additional maintainers that can help improve this project.
+
+### Providing feedback
+
+You can provide feedback using the issues feature of GitHub.
+[Open an Issue](https://github.com/UlisesAlexanderAM/skillventory/issues/new)
+to request features, report bugs, or ask a question.
+
+### Graphic Design
+
+At the moment **Skillventory** doesn't have a logo or any kind of supplemental
+imagery. So I welcome any submissions or suggestions for the logo and graphics
+associated with **Skillventory**
+
+### Documentation
+
+You can help me proofreading and fixing any typo or formatting issues in the `docs/`
+or `README` files. [*Material for MkDocs*](https://squidfunk.github.io/mkdocs-material/)
+is use to build and publish the documentation.
+
+!!! note
+    The `index.md` and `README.md` files are content equals.
+
+### Code
+
+You can also help with code.
+
+#### Setting up your dev enviroment
+
+The first thing you probably want to do is fork the project. You can do it
+from the web or if you have GH CLI installed in your system, with the following
+command:
+
+```shell
+gh repo fork UlisesAlexanderAM/skillventory
+```
+
+If you haven't clone your fork into your system, proceed to do it.
+
+This project uses [poetry](https://python-poetry.org/),
+so I recommend you install it first, if you don't already have it installed.
+
+=== "With pipx"
+
+    ```shell
+    pipx install poetry
+    ```
+
+=== "With the official installer"
+
+    **Linux, macOS, Windows(WSL)**
+
+    ```shell
+    curl -sSL https://install.python-poetry.org | python3 -
+    ```
+
+    **Windows(Powershell)**
+
+    ```shell
+    (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+    ```
+
+With **poetry** already in your system, and your fork, is time to install the dependencies.
+
+=== "Basic dev environment"
+
+    ```shell
+    poetry install --no-root --with test
+    ```
+
+=== "With linting tools"
+
+    ```shell
+    poetry install --no-root --with test linting
+    ```
+
+=== "Working with docs"
+
+    ```shell
+    poetry install --no-root --with docs
+    ```
+
+=== "All included"
+
+    ```shell
+    poetry install --no-root -with test linting docs
+    ```
+
+You can use `poetry shell` to spawn a subshell,
+or is possible that your IDE already detects your environment.
+
+To test your code, simply use `pytest`.
+
+=== "Inside the environment"
+
+    ```shell
+    pytest
+    ```
+
+=== "Outside the environment (environment not active)"
+
+    ```shell
+    poetry run pytest
+    ```
+
+Finally open a pull request, if you add new funtionality please add
+some tests. In case you don't know how or need help open your PR as
+a draft pull request.
