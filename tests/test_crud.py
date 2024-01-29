@@ -105,17 +105,21 @@ class TestUpdateSkill:
         caplog: Any,
     ) -> None:
         new_skill_name: str = "Java"
-
-        crud.update_skill_name(
-            session=get_db_session, skill_id=skill_id, new_name=new_skill_name
-        )
-        skill_updated: Optional[models.Skill] = crud.get_skill_by_id(
-            session=get_db_session, skill_id=skill_id
-        )
+        skill = crud.get_skill_by_id(session=get_db_session, skill_id=skill_id)
 
         if expected_warning:
             assert f"The skill with id {skill_id} doesn't exist" in caplog.text
         else:
+            crud.update_skill_if_changed(
+                session=get_db_session,
+                skill=skill,
+                skill_name=new_skill_name,
+                skill_level=skill.level_of_confidence,
+            )
+            skill_updated: Optional[models.Skill] = crud.get_skill_by_id(
+                session=get_db_session, skill_id=skill_id
+            )
+
             assert skill_updated is not None
             assert skill_updated.skill_id == skill_id
             assert skill_updated.skill_name == new_skill_name
@@ -129,10 +133,11 @@ class TestUpdateSkill:
         caplog: Any,
     ) -> None:
         new_level_of_confidence = models.LevelOfConfidence.LEVEL_2
+        skill = crud.get_skill_by_id(session=get_db_session, skill_id=skill_id)
 
-        crud.update_skill_level_of_confidence(
+        crud._update_skill_level_of_confidence(
             session=get_db_session,
-            skill_id=skill_id,
+            skill=skill,
             new_level=new_level_of_confidence,
         )
         skill_updated: Optional[models.Skill] = crud.get_skill_by_id(

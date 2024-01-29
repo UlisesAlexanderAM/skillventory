@@ -106,11 +106,8 @@ class TestGetSkillByName:
 @pytest.mark.usefixtures("_post_one_skill")
 class TestUpdateSkillName:
     @pytest.fixture()
-    def skill_name_modified(
-        self, factory_skills_json: Callable[[int], list[dict[str, str]]]
-    ) -> dict[str, str]:
-        original_skill = factory_skills_json(1)[0]
-        skill_modified = original_skill.copy()
+    def skill_name_modified(self, one_json_skill: dict[str, str]) -> dict[str, str]:
+        skill_modified = one_json_skill.copy()
         skill_modified["skill_name"] = "Clojure"
         return skill_modified
 
@@ -128,9 +125,39 @@ class TestUpdateSkillName:
 
         assert response.status_code == expected_status_code
 
-    def test_content(self, skill_name_modified: dict[str, str]) -> None:
+    def test_update_name_content(self, skill_name_modified: dict[str, str]) -> None:
         skill_id = 1
         response = client.patch(f"/skills/{skill_id}", json=skill_name_modified)
         skill_received = skill_name_modified.copy()
-        skill_received.update({"skill_id": 1})  # noqa: dict-item
+        skill_received.update({"skill_id": skill_id})
+        assert response.json() == skill_received
+
+
+@pytest.mark.usefixtures("_post_one_skill")
+class TestUpdateSkillLevel:
+    @pytest.fixture()
+    def skill_level_modified(self, one_json_skill: dict[str, str]) -> dict[str, str]:
+        skill_modified = one_json_skill.copy()
+        skill_modified["level_of_confidence"] = models.LevelOfConfidence.LEVEL_2.value
+        return skill_modified
+
+    @pytest.mark.parametrize(
+        ("skill_id", "expected_status_code"),
+        [(1, status.HTTP_200_OK), (2, status.HTTP_404_NOT_FOUND)],
+    )
+    def test_update_level_status_code(
+        self,
+        skill_id: int,
+        expected_status_code: int,
+        skill_level_modified: dict[str, str],
+    ) -> None:
+        response = client.patch(f"/skills/{skill_id}", json=skill_level_modified)
+
+        assert response.status_code == expected_status_code
+
+    def test_update_level_content(self, skill_level_modified: dict[str, str]) -> None:
+        skill_id = 1
+        response = client.patch(f"/skills/{skill_id}", json=skill_level_modified)
+        skill_received = skill_level_modified.copy()
+        skill_received.update({"skill_id": skill_id})
         assert response.json() == skill_received
