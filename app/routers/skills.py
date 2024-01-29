@@ -94,17 +94,17 @@ def update_skill(
     ],
 ) -> Any:
     skill_to_update = crud.get_skill_by_id(session=session, skill_id=skill_id)
-    skill_name_received = skill.skill_name
     if skill_to_update is None:
         raise fa.HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Skill with Id {skill_id} not found",
         )
-    if (
-        skill_to_update.skill_name != skill_name_received
-        and skill_name_received is not None
-    ):
-        crud.update_skill_name(
-            session=session, skill_id=skill_id, new_name=skill_name_received
-        )
+    skill_name_received = skill.skill_name
+    skill_level_received = skill.level_of_confidence
+    crud.update_skill_if_changed(
+        session=session,
+        skill=skill_to_update,
+        skill_name=skill_name_received,
+        skill_level=skill_level_received,
+    )
     return crud.get_skill_by_id(session=session, skill_id=skill_id)

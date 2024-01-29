@@ -61,11 +61,10 @@ def delete_skill(session: sqlmodel.Session, skill: Optional[models.Skill]) -> No
         logger.info(f"Skill {skill.skill_name} deleted successfully")
 
 
-def update_skill_name(session: sqlmodel.Session, skill_id: int, new_name: str) -> None:
-    skill: Optional[models.Skill] = get_skill_by_id(session=session, skill_id=skill_id)
-    if skill is None:
-        logger.warning(f"The skill with id {skill_id} doesn't exist")
-    else:
+def _update_skill_name(
+    session: sqlmodel.Session, skill: Optional[models.Skill], new_name: str
+) -> None:
+    if skill:
         logger.info(f"Changing the name of {skill.skill_name} to {new_name}")
         skill.skill_name = new_name
         session.add(skill)
@@ -74,16 +73,32 @@ def update_skill_name(session: sqlmodel.Session, skill_id: int, new_name: str) -
         logger.info("Skill name changed successfully")
 
 
-def update_skill_level_of_confidence(
-    session: sqlmodel.Session, skill_id: int, new_level: models.LevelOfConfidence
+def _update_skill_level_of_confidence(
+    session: sqlmodel.Session,
+    skill: Optional[models.Skill],
+    new_level: models.LevelOfConfidence,
 ) -> None:
-    skill: Optional[models.Skill] = get_skill_by_id(session=session, skill_id=skill_id)
-    if skill is None:
-        logger.warning(f"The skill with id {skill_id} doesn't exist")
-    else:
+    if skill:
         logger.info(f"Changing the level of {skill.skill_name} to {new_level}")
         skill.level_of_confidence = new_level
         session.add(skill)
         session.commit()
         session.refresh(skill)
         logger.info("Skill level changed successfully")
+
+
+def update_skill_if_changed(
+    session: sqlmodel.Session,
+    skill: models.Skill,
+    skill_name: str,
+    skill_level: models.LevelOfConfidence,
+) -> None:
+    if skill is None:
+        logger.warning("The skill doesn't exist")
+    else:
+        if skill.skill_name != skill_name:
+            _update_skill_name(session=session, skill=skill, new_name=skill_name)
+        if skill.level_of_confidence != skill_level:
+            _update_skill_level_of_confidence(
+                session=session, skill=skill, new_level=skill_level
+            )
