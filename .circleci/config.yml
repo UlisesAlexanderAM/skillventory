@@ -193,9 +193,9 @@ workflows:
             - testing-and-generating-report
           auth:
             - aws-cli/setup:
-                profile_name: $(AWS_PROFILE_NAME)
-          profile_name: $(AWS_PROFILE_NAME)
+                role_arn: $(AWS_ROLE_ARN)
           public_registry: true
+          create_repo: true
           repo: $(MY_APP_PREFIX)
           tag: "$(CIRCLE_SHA1)"
       - aws-ecs/deploy_service_update:
@@ -203,7 +203,7 @@ workflows:
             - aws-ecr/build_and_push_image
           auth:
             - aws-cli/setup:
-                profile_name: $(AWS_PROFILE_NAME)
+                role_arn: $(AWS_ROLE_ARN)
           family: "$(MY_APP_PREFIX)-service"
           cluster: "$(MY_APP_PREFIX)-cluster"
           container_image_name_updates: "container=$(MY_APP_PREFIX)-service,tag=$(CIRCLE_SHA1)"
