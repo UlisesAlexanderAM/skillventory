@@ -191,13 +191,19 @@ workflows:
       - aws-ecr/build_and_push_image:
           requires:
             - testing-and-generating-report
-          profile-name: $(AWS_PROFILE_NAME)
-          public-registry: true
+          auth:
+            - aws-cli/setup:
+                profile_name: $(AWS_PROFILE_NAME)
+          profile_name: $(AWS_PROFILE_NAME)
+          public_registry: true
           repo: $(MY_APP_PREFIX)
           tag: "$(CIRCLE_SHA1)"
       - aws-ecs/deploy_service_update:
           requires:
             - aws-ecr/build_and_push_image
+          auth:
+            - aws-cli/setup:
+                profile_name: $(AWS_PROFILE_NAME)
           family: "$(MY_APP_PREFIX)-service"
           cluster: "$(MY_APP_PREFIX)-cluster"
-          container-image-name-updates: "container=$(MY_APP_PREFIX)-service,tag=$(CIRCLE_SHA1)"
+          container_image_name_updates: "container=$(MY_APP_PREFIX)-service,tag=$(CIRCLE_SHA1)"
