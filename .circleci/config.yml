@@ -196,14 +196,14 @@ workflows:
                 role_arn: arn:aws:iam::142111551490:role/CircleCI
           public_registry: true
           create_repo: true
-          repo: $(MY_APP_PREFIX)
-          tag: "$(CIRCLE_SHA1)"
+          repo: ${MY_APP_PREFIX}
+          tag: "${CIRCLE_SHA1}"
       - aws-ecs/deploy_service_update:
           requires:
             - aws-ecr/build_and_push_image
           auth:
             - aws-cli/setup:
                 role_arn: arn:aws:iam::142111551490:role/CircleCI
-          family: "$(MY_APP_PREFIX)-service"
-          cluster: "$(MY_APP_PREFIX)-cluster"
-          container_image_name_updates: "container=$(MY_APP_PREFIX)-service,tag=$(CIRCLE_SHA1)"
+          family: "${MY_APP_PREFIX}-service"
+          cluster: "${MY_APP_PREFIX}-cluster"
+          container_image_name_updates: "container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}"
