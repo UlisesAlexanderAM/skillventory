@@ -1,5 +1,5 @@
 services:
   app:
-    image: personal-inventory
+    image: skillventory
     ports:
       - "8000:80"
