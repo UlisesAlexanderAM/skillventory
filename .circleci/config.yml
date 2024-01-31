@@ -188,14 +188,16 @@ workflows:
       - codacy-coverage-report:
           requires:
             - testing-and-generating-report
-      - aws-ecr/build-and-push-image:
+      - aws-ecr/build_and_push_image:
+          requires:
+            - testing-and-generating-report
           profile-name: $(AWS_PROFILE_NAME)
           public-registry: true
           repo: $(MY_APP_PREFIX)
           tag: "$(CIRCLE_SHA1)"
-      - aws-ecs/deploy-service-update:
+      - aws-ecs/deploy_service_update:
           requires:
-            - aws-ecr/build-and-push-image
+            - aws-ecr/build_and_push_image
           family: "$(MY_APP_PREFIX)-service"
           cluster: "$(MY_APP_PREFIX)-cluster"
           container-image-name-updates: "container=$(MY_APP_PREFIX)-service,tag=$(CIRCLE_SHA1)"
