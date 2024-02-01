@@ -12,3 +12,8 @@ config.create_db_and_tables()
 
 app = fastapi.FastAPI()
 app.include_router(router=skills.router)
+
+
+@app.get("/")
+def main() -> dict[str, str]:
+    return {"message": "Welcome to Skillventory"}
