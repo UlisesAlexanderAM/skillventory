@@ -45,20 +45,63 @@ def test_post_skill(
     assert response.json() == expected_json
 
 
-@pytest.mark.parametrize("num_skills", [0, 1, 2])
-def test_get_skills(
-    num_skills: int,
-    factory_skills_json: Callable[[int], list[dict[str, str]]],
-) -> None:
-    skills_json = factory_skills_json(2)
+class TestGetSkills:
+    default_limit = 15
 
-    for _ in range(num_skills):
-        client.post("/skills", json=skills_json[_])
-    response: Response = client.get("/skills")
+    @pytest.fixture()
+    def post_skills(
+        self, factory_skills_json: Callable[[int], list[dict[str, str]]]
+    ) -> Callable[[int], None]:
+        def _post_skills(number_of_skills: int) -> None:
+            skills_json = factory_skills_json(number_of_skills)
+            for _ in range(number_of_skills):
+                client.post("/skills", json=skills_json[_])
 
-    assert response.status_code == status.HTTP_200_OK
-    assert len(response.json()) == num_skills
-    assert response.headers["X-Total-Count"] == str(num_skills)
+        return _post_skills
+
+    @pytest.mark.parametrize("num_skills", [0, 1, 2])
+    def test_status_code(
+        self,
+        post_skills: Callable[[int], None],
+        num_skills: int,
+    ) -> None:
+        post_skills(num_skills)
+        response: Response = client.get("/skills")
+
+        assert response.status_code == status.HTTP_200_OK
+
+    @pytest.mark.parametrize(
+        ("number_of_skills_created", "number_of_skills_received"), [(1, 1), (16, 15)]
+    )
+    def test_page_1(
+        self,
+        post_skills: Callable[[int], None],
+        number_of_skills_created: int,
+        number_of_skills_received: int,
+    ):
+        post_skills(number_of_skills_created)
+        response = client.get("/skills")
+
+        assert len(response.json()) == number_of_skills_received
+
+    @pytest.mark.parametrize(
+        ("number_of_skills_created", "number_of_skills_received", "offset"),
+        [(1, 1, 0), (16, 1, 15)],
+    )
+    def test_offset(
+        self,
+        post_skills: Callable[[int], None],
+        number_of_skills_created: int,
+        number_of_skills_received: int,
+        offset: int,
+    ):
+        post_skills(number_of_skills_created)
+        response = client.get(f"/skills?offset={offset}")
+
+        assert len(response.json()) == number_of_skills_received
+        assert response.headers["X-Total-Count"] == str(number_of_skills_created)
+        assert response.headers["X-Offset"] == str(offset)
+        assert response.headers["X-Limit"] == str(self.default_limit)
 
 
 @pytest.mark.usefixtures("_post_one_skill")
