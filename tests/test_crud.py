@@ -164,9 +164,9 @@ class TestGetSkills:
             number_of_skills
         )
 
-        skills_db: Sequence[models.Skill] = crud.get_skills(session=get_db_session)
+        (skills_db, count) = crud.get_skills(session=get_db_session)
 
-        assert len(skills_db) == number_of_skills
+        assert count == number_of_skills
         for skill_wanted, skill_db in zip(skills_wanted, skills_db, strict=True):
             assert skill_db.skill_name == skill_wanted.skill_name
             assert skill_db.level_of_confidence == skill_wanted.level_of_confidence
@@ -183,7 +183,7 @@ class TestGetSkills:
     ) -> None:
         factory_skills_in_db(number_of_skills_created)
 
-        skills_db: Sequence[models.Skill] = crud.get_skills(session=get_db_session)
+        (skills_db, _) = crud.get_skills(session=get_db_session)
 
         assert len(skills_db) == number_of_skills_received
 
@@ -201,8 +201,6 @@ class TestGetSkills:
     ) -> None:
         factory_skills_in_db(number_of_skills_created)
 
-        skills_db: Sequence[models.Skill] = crud.get_skills(
-            session=get_db_session, offset=offset
-        )
+        (skills_db, _) = crud.get_skills(session=get_db_session, offset=offset)
 
         assert len(skills_db) == number_of_skills_received
