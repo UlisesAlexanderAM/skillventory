@@ -1,11 +1,12 @@
 """CRUD functions."""
 
 from collections.abc import Sequence
-from typing import Optional
+from typing import Optional, Tuple
 
 import sqlmodel
 from loguru import logger
 from sqlalchemy import exc
+from sqlalchemy.sql import expression
 
 from app.models import models
 
@@ -46,12 +47,15 @@ def create_skill(session: sqlmodel.Session, skill: models.SkillBase) -> None:
 
 def get_skills(
     session: sqlmodel.Session, offset: int = 0, limit: int = 15
-) -> Sequence[models.Skill]:
+) -> Tuple[Sequence[models.Skill], int]:
     statement = sqlmodel.select(models.Skill).offset(offset).limit(limit)
     results = session.exec(statement)
     skills = results.all()
+    count_statement = sqlmodel.select(expression.func.count()).select_from(models.Skill)
+    count_results = session.exec(count_statement)
+    count = count_results.one()
     logger.info("Operation 'get_skills' ended successfully")
-    return skills
+    return skills, count
 
 
 def delete_skill(session: sqlmodel.Session, skill: Optional[models.Skill]) -> None:
