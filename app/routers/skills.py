@@ -22,9 +22,13 @@ router: fa.APIRouter = fa.APIRouter(
 def get_skills(
     session: Annotated[sqlmodel.Session, fa.Depends(deps.get_db_session)],
     response: fa.Response,
+    limit: Annotated[int, fa.Query()] = 15,
+    offset: Annotated[int, fa.Query()] = 0,
 ) -> Sequence[models.Skill]:
-    skills = crud.get_skills(session=session)
-    response.headers["X-Total-Count"] = str(len(skills))
+    (skills, count) = crud.get_skills(session=session, offset=offset, limit=limit)
+    response.headers["X-Total-Count"] = str(count)
+    response.headers["X-Offset"] = str(offset)
+    response.headers["X-Limit"] = str(limit)
     return skills
 
 
