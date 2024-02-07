@@ -102,9 +102,8 @@ you give access to the container.
 Here is a little roadmap of what I want to implement and what its already implemented.
 
 - [x] Complete CRUD API (functions that interact with the DB)
-- [ ] Rest API for the personal inventory
+- [x] Rest API for the personal inventory
 - [ ] Upload Docker image to Docker Hub
-- [ ] Host the API in the web
 - [ ] Simple demo web client
 - [ ] Simple gtk+ desktop client
 
