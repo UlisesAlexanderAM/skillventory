@@ -2,13 +2,13 @@ FROM python:3.11-slim
 
 WORKDIR /code
 
-USER nonroot
+USER root
 
-RUN ["pip", "install", "--user", "poetry==1.7"]
+RUN ["pip", "install", "poetry==1.7"]
 
 COPY ./pyproject.toml ./poetry.lock* /code/
 
-RUN ["poetry", "install"]
+RUN ["poetry", "install", "--no-root"]
 
 COPY ./app /code/app
 
