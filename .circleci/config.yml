@@ -230,4 +230,3 @@ workflows:
             - testing-and-generating-report
           image: $DOCKER_PROJECT_USERNAME/$MY_APP_PREFIX
           tag: latest
-          update-description: true
