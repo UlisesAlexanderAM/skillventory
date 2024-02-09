@@ -5,6 +5,7 @@ orbs:
   aws-cli: circleci/aws-cli@4.1.2
   aws-ecr: circleci/aws-ecr@9.0.2
   aws-ecs: circleci/aws-ecs@4.0.0
+  docker: circleci/docker@2.5.0
 jobs:
   testing-and-generating-report:
     docker:
@@ -164,31 +165,55 @@ jobs:
           project-token: $CODACY_PROJECT_TOKEN
 
 workflows:
-  testing:
+  test-and-publish:
     jobs:
-      - setup
+      - setup:
+          filters:
+            tags:
+              only: /.*/
       - linting-ruff:
+          filters:
+            tags:
+              only: /.*/
           requires:
             - setup
       - linting-bandit:
+          filters:
+            tags:
+              only: /.*/
           requires:
             - setup
       - linting-mypy:
+          filters:
+            tags:
+              only: /.*/
           requires:
             - setup
       - linting-pytype:
+          filters:
+            tags:
+              only: /.*/
           requires:
             - setup
       - testing-and-generating-report:
+          filters:
+            tags:
+              only: /.*/
           requires:
             - linting-ruff
             - linting-bandit
             - linting-mypy
             - linting-pytype
       - codacy-coverage-report:
+          filters:
+            tags:
+              only: /.*/
           requires:
             - testing-and-generating-report
       - aws-ecr/build_and_push_image:
+          filters:
+            branches:
+              only: main
           requires:
             - testing-and-generating-report
           auth:
@@ -197,3 +222,12 @@ workflows:
           public_registry: true
           create_repo: true
           repo: ${MY_APP_PREFIX}
+      - docker/publish:
+          filters:
+            branches:
+              only: main
+          requires:
+            - testing-and-generating-report
+          image: $DOCKER_PROJECT_USERNAME/$MY_APP_PREFIX
+          tag: latest
+          update-description: true
