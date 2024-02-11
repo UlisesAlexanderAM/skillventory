@@ -5,8 +5,8 @@ import pytest
 from fastapi import status, testclient
 from httpx import Response
 
-from app import main
-from app.models import models
+from skillventory import main
+from skillventory.models import models
 
 client = testclient.TestClient(app=main.app)
 

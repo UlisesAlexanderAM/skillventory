@@ -6,10 +6,10 @@ from _pytest import logging
 from loguru import logger
 import sqlmodel
 
-from app import main
-from app.data import crud, dependencies
-from app.database import config
-from app.models import models
+from skillventory import main
+from skillventory.data import crud, dependencies
+from skillventory.database import config
+from skillventory.models import models
 
 
 @pytest.fixture()

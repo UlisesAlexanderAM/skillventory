@@ -7,9 +7,9 @@ import fastapi as fa
 import sqlmodel
 from fastapi import responses, status
 
-from app.data import crud
-from app.data import dependencies as deps
-from app.models import models
+from skillventory.data import crud
+from skillventory.data import dependencies as deps
+from skillventory.models import models
 
 router: fa.APIRouter = fa.APIRouter(
     prefix="/skills",

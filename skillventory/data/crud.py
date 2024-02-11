@@ -8,7 +8,7 @@ from loguru import logger
 from sqlalchemy import exc
 from sqlalchemy.sql import expression
 
-from app.models import models
+from skillventory.models import models
 
 
 def get_skill_by_id(session: sqlmodel.Session, skill_id: int) -> Optional[models.Skill]:

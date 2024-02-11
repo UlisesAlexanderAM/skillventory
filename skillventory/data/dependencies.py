@@ -4,7 +4,7 @@ from collections.abc import Iterator
 
 import sqlmodel
 
-from app.database import config
+from skillventory.database import config
 
 
 def get_db_session() -> Iterator[sqlmodel.Session]:

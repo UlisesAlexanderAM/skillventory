@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "personal-inventory"
+name = "skillventory"
 version = "0.1.0"
-description = "Originally a web app to use as a personal inventory. Now an API to use, create, and manage a personal inventory."
+description = "REST API to manage a personal inventory"
 authors = [
     "Ulises Alexander Arguelles Monjaraz <ulises_alexander_am@proton.me>",
 ]

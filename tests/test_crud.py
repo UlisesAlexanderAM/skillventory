@@ -4,8 +4,8 @@ from typing import Any, Literal, Optional
 import pytest
 import sqlmodel
 
-from app.data import crud
-from app.models import models
+from skillventory.data import crud
+from skillventory.models import models
 
 
 @pytest.fixture()
