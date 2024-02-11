@@ -12,7 +12,7 @@ from skillventory.data import dependencies as deps
 from skillventory.models import models
 
 router: fa.APIRouter = fa.APIRouter(
-    prefix="/skills",
+    prefix="/v1/skills",
     tags=["Skills"],
     responses={404: {"description": "Skill not found"}},
 )
