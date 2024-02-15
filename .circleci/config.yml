@@ -51,7 +51,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - "app"
+            - "skillventory"
             - "tests"
             - "pyproject.toml"
             - "poetry.lock"
@@ -124,7 +124,7 @@ jobs:
       - run:
           name: mypy type checking
           command: |
-            poetry run mypy -p app
+            poetry run mypy -p skillventory
       - save_cache:
           key: v1-linting-{{ checksum "poetry.lock" }}
           paths:

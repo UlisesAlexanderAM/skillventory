@@ -132,7 +132,7 @@ major_version_zero = true
 exclude_dirs=["tests"]
 
 [tool.pytype]
-inputs = ["app"]
+inputs = ["skillventory"]
 
 [build-system]
 requires = ["poetry-core"]
