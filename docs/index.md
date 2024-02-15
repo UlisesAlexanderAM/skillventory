@@ -31,52 +31,12 @@ front-end as demos.
 
 ## 🚀 Quickstart
 
-### Clone the repository
-
-The first thing you need to do to use this tool is get the source code from the repository.
-
-=== "Git"
-
-    ``` shell
-    git clone https://github.com/UlisesAlexanderAM/Personal-inventory
-    ```
-
-=== "GitHub ClI"
-
-    ``` bash
-    gh repo clone UlisesAlexanderAM/Personal-inventory
-    ```
-
-### Docker compose (Recommended)
-
-=== "Local Development/Use"
-    If you want to use it for local development of the frontend or personal use.
-    And you have the port 8000 in use, you need to change the port in `#!shell compose.yml`
-
-    ``` title="compose.yml" hl_lines="5"
-    --8<-- "compose.yml"
-    ```
-
-    Then you can get the service up with:
-
-    ``` shell
-    docker compose up
-    ```
-
-=== "Deployment"
-    If you want to deploy it, you have to avoid sending the
-    `compose.override.yml` file. Then you can get the service up with:
-
-    ```
-    docker compose up
-    ```
-
 ### Docker
 
-=== "Local Development/Use"
+=== "Local use"
 
     ```
-    docker run -p <Local_Port>:80 personal-inventory
+    docker run -p <Local_Port>:80 ulisesalexanderam/skillventory:latest
     ```
 
     Where the `Local_Port` is the port where you want to access the container
@@ -85,7 +45,7 @@ The first thing you need to do to use this tool is get the source code from the 
 === "Deployment"
 
     ```
-    docker run -p <Deployment_Host_Port>:80 personal-inventory
+    docker run -p <Deployment_Host_Port>:80 ulisesalexanderam/skillventory:latest
     ```
 
     Where the `Deployment_Host_Port` is the port in the deployment host from where
@@ -98,7 +58,7 @@ Here is a little roadmap of what I want to implement and what its already implem
 
 - [x] Complete CRUD API (functions that interact with the DB)
 - [x] Rest API for the personal inventory
-- [ ] Upload Docker image to Docker Hub
+- [x] Upload Docker image to Docker Hub
 - [ ] Simple demo web client
 - [ ] Simple gtk+ desktop client
 
