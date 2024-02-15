@@ -24,7 +24,7 @@ jobs:
       - run:
           name: Generate test report
           command: |
-            poetry run pytest --junitxml=test-results/junit.xml --cov-report xml:coverage.xml --cov=app tests/
+            poetry run pytest --junitxml=test-results/junit.xml --cov-report xml:coverage.xml --cov=skillventory tests/
       - store_test_results:
           path: test-results
       - persist_to_workspace:
