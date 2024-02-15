@@ -10,6 +10,8 @@ from skillventory.models import models
 
 client = testclient.TestClient(app=main.app)
 
+BASE_ROUTE = "/v1/skills"
+
 
 @pytest.fixture()
 def one_json_skill(
@@ -21,7 +23,7 @@ def one_json_skill(
 @pytest.fixture()
 def _post_one_skill(one_json_skill: dict[str, str]) -> None:
     skill = one_json_skill
-    client.post("/skills", json=skill)
+    client.post(BASE_ROUTE, json=skill)
 
 
 @pytest.mark.usefixtures("override_get_db_session")
@@ -39,7 +41,7 @@ def test_post_skill(
     factory_skills_json: Callable[[int], list[dict[str, str]]],
 ) -> None:
     for _ in range(num_skills):
-        response = client.post("/skills", json=factory_skills_json(1)[0])
+        response = client.post(BASE_ROUTE, json=factory_skills_json(1)[0])
 
     assert response.status_code == expected_status_code
     assert response.json() == expected_json
@@ -55,7 +57,7 @@ class TestGetSkills:
         def _post_skills(number_of_skills: int) -> None:
             skills_json = factory_skills_json(number_of_skills)
             for _ in range(number_of_skills):
-                client.post("/skills", json=skills_json[_])
+                client.post(BASE_ROUTE, json=skills_json[_])
 
         return _post_skills
 
@@ -66,7 +68,7 @@ class TestGetSkills:
         num_skills: int,
     ) -> None:
         post_skills(num_skills)
-        response: Response = client.get("/skills")
+        response: Response = client.get(BASE_ROUTE)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -80,7 +82,7 @@ class TestGetSkills:
         number_of_skills_received: int,
     ):
         post_skills(number_of_skills_created)
-        response = client.get("/skills")
+        response = client.get(BASE_ROUTE)
 
         assert len(response.json()) == number_of_skills_received
 
@@ -96,7 +98,7 @@ class TestGetSkills:
         offset: int,
     ):
         post_skills(number_of_skills_created)
-        response = client.get(f"/skills?offset={offset}")
+        response = client.get(f"{BASE_ROUTE}?offset={offset}")
 
         assert len(response.json()) == number_of_skills_received
         assert response.headers["X-Total-Count"] == str(number_of_skills_created)
@@ -115,7 +117,7 @@ class TestGetSkillById:
         skill_id: int,
         expected_status_code: int,
     ) -> None:
-        response: Response = client.get(f"/skills/id/{skill_id}")
+        response: Response = client.get(f"{BASE_ROUTE}/id/{skill_id}")
 
         assert response.status_code == expected_status_code
 
@@ -131,13 +133,13 @@ class TestGetSkillByName:
         skill_name: str,
         expected_status_code: int,
     ) -> None:
-        response: Response = client.get(f"/skills/name/{skill_name}")
+        response: Response = client.get(f"{BASE_ROUTE}/name/{skill_name}")
 
         assert response.status_code == expected_status_code
 
     def test_content(self) -> None:
         skill_name = "python_0"
-        response = client.get(f"/skills/name/{skill_name}")
+        response = client.get(f"{BASE_ROUTE}/name/{skill_name}")
 
         assert response.json() == {
             "skill_id": 1,
@@ -164,13 +166,13 @@ class TestUpdateSkillName:
         expected_status_code: int,
         skill_name_modified: dict[str, str],
     ) -> None:
-        response = client.patch(f"/skills/{skill_id}", json=skill_name_modified)
+        response = client.patch(f"{BASE_ROUTE}/{skill_id}", json=skill_name_modified)
 
         assert response.status_code == expected_status_code
 
     def test_update_name_content(self, skill_name_modified: dict[str, str]) -> None:
         skill_id = 1
-        response = client.patch(f"/skills/{skill_id}", json=skill_name_modified)
+        response = client.patch(f"{BASE_ROUTE}/{skill_id}", json=skill_name_modified)
         skill_received = skill_name_modified.copy()
         skill_received.update({"skill_id": skill_id})
         assert response.json() == skill_received
@@ -194,13 +196,13 @@ class TestUpdateSkillLevel:
         expected_status_code: int,
         skill_level_modified: dict[str, str],
     ) -> None:
-        response = client.patch(f"/skills/{skill_id}", json=skill_level_modified)
+        response = client.patch(f"{BASE_ROUTE}/{skill_id}", json=skill_level_modified)
 
         assert response.status_code == expected_status_code
 
     def test_update_level_content(self, skill_level_modified: dict[str, str]) -> None:
         skill_id = 1
-        response = client.patch(f"/skills/{skill_id}", json=skill_level_modified)
+        response = client.patch(f"{BASE_ROUTE}/{skill_id}", json=skill_level_modified)
         skill_received = skill_level_modified.copy()
         skill_received.update({"skill_id": skill_id})
         assert response.json() == skill_received
