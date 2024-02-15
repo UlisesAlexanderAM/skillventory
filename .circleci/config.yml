@@ -215,5 +215,5 @@ workflows:
           requires:
             - testing-and-generating-report
           image: ${DOCKER_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
-          tag: ${CIRCLE_SHA1}-${CIRCLE_TAG}, latest
+          tag: ${CIRCLE_SHA1}-${CIRCLE_TAG},latest
           use-buildkit: true
