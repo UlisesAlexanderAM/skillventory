@@ -1,3 +1,13 @@
+## 0.3.0 (2024-03-14)
+
+### Feat
+
+- add a simple table that shows my skills
+
+### Fix
+
+- **database/config**: avoid using the same env file for testing and production
+
 ## 0.2.0 (2024-02-15)
 
 ### Feat
