@@ -23,7 +23,7 @@ def one_json_skill(
 @pytest.fixture()
 def _post_one_skill(one_json_skill: dict[str, str]) -> None:
     skill = one_json_skill
-    client.post(BASE_ROUTE, json=skill)
+    client.post(f"{BASE_ROUTE}/", json=skill)
 
 
 @pytest.mark.usefixtures("override_get_db_session")
@@ -41,7 +41,7 @@ def test_post_skill(
     factory_skills_json: Callable[[int], list[dict[str, str]]],
 ) -> None:
     for _ in range(num_skills):
-        response = client.post(BASE_ROUTE, json=factory_skills_json(1)[0])
+        response = client.post(f"{BASE_ROUTE}/", json=factory_skills_json(1)[0])
 
     assert response.status_code == expected_status_code
     assert response.json() == expected_json
@@ -57,7 +57,7 @@ class TestGetSkills:
         def _post_skills(number_of_skills: int) -> None:
             skills_json = factory_skills_json(number_of_skills)
             for _ in range(number_of_skills):
-                client.post(BASE_ROUTE, json=skills_json[_])
+                client.post(f"{BASE_ROUTE}/", json=skills_json[_])
 
         return _post_skills
 
@@ -68,7 +68,7 @@ class TestGetSkills:
         num_skills: int,
     ) -> None:
         post_skills(num_skills)
-        response: Response = client.get(BASE_ROUTE)
+        response: Response = client.get(f"{BASE_ROUTE}/")
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -82,7 +82,7 @@ class TestGetSkills:
         number_of_skills_received: int,
     ):
         post_skills(number_of_skills_created)
-        response = client.get(BASE_ROUTE)
+        response = client.get(f"{BASE_ROUTE}/")
 
         assert len(response.json()) == number_of_skills_received
 
@@ -98,7 +98,7 @@ class TestGetSkills:
         offset: int,
     ):
         post_skills(number_of_skills_created)
-        response = client.get(f"{BASE_ROUTE}?offset={offset}")
+        response = client.get(f"{BASE_ROUTE}/?offset={offset}")
 
         assert len(response.json()) == number_of_skills_received
         assert response.headers["X-Total-Count"] == str(number_of_skills_created)
