@@ -52,7 +52,7 @@ class DBTestingSettings(pydantic_settings.BaseSettings):
 
     SQLITE_URL: str = "sqlite://"
 
-    model_config = pydantic_settings.SettingsConfigDict(env_file=".env")
+    model_config = pydantic_settings.SettingsConfigDict(env_file="dev.env")
 
 
 db_testing_settings = DBTestingSettings()
