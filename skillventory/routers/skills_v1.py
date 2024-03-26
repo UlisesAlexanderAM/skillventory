@@ -40,7 +40,38 @@ def get_skills(
 )
 def post_skill(
     session: Annotated[sqlmodel.Session, fa.Depends(deps.get_db_session)],
-    skill: Annotated[models.SkillBase, fa.Body(description="Skill to add to the DB.")],
+    skill: Annotated[
+        models.SkillBase,
+        fa.Body(
+            description="Skill to add to the DB.",
+            openapi_examples={
+                "level_1": {
+                    "summary": "An example with level 1 of confidence",
+                    "description": 'An example with level of confidence "Inicio del aprendizaje/desarrollo pendiente"',
+                    "value": {
+                        "skill_name": "Skill",
+                        "level_of_confidence": "Inicio del aprendizaje/desarrollo pendiente",
+                    },
+                },
+                "level_2": {
+                    "summary": "An example with level 2 of confidence",
+                    "description": 'An example with level of confidence "Estoy aprendiendo o desarrollando"',
+                    "value": {
+                        "skill_name": "Skill",
+                        "level_of_confidence": "Estoy aprendiendo o desarrollando",
+                    },
+                },
+                "level_3": {
+                    "summary": "An example with level 3 of confidence",
+                    "description": 'An example with level of confidence "Tengo confianza, pero el cielo es el limite"',
+                    "value": {
+                        "skill_name": "Skill",
+                        "level_of_confidence": "Tengo confianza, pero el cielo es el limite",
+                    },
+                },
+            },
+        ),
+    ],
 ) -> Dict[str, str]:
     if not crud.get_skill_by_name(session=session, skill_name=skill.skill_name):
         crud.create_skill(session=session, skill=skill)
