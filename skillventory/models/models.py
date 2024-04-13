@@ -17,7 +17,7 @@ and for serialization/deserialization with Pydantic.
 """
 
 import enum
-from typing import Optional, ClassVar, Dict
+from typing import Optional
 import sqlmodel
 
 
@@ -35,7 +35,7 @@ class SkillBase(sqlmodel.SQLModel):
     skill_name: str
     level_of_confidence: LevelOfConfidence
 
-    model_config: ClassVar[Dict[str, Dict[str, list[Dict[str, str]]]]] = {
+    model_config = {
         "json_schema_extra": {
             "examples": [
                 {
