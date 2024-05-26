@@ -6,7 +6,7 @@ ENV POETRY_VIRTUALENVS_IN_PROJECT=true \
 ENV HOME="/home/nonroot"
 ENV PATH="${HOME}/.local/bin:${PATH}"
 
-RUN apk add "pipx=~1.4" --no-cache
+RUN apk add "pipx=~1.5" --no-cache
 RUN adduser -D nonroot
 
 USER nonroot
