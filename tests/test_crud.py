@@ -8,7 +8,7 @@ from skillventory.data import crud
 from skillventory.models import models
 
 
-@pytest.fixture()
+@pytest.fixture
 def _create_one_skill_in_db(
     factory_skills_in_db: Callable[[int], list[models.SkillBase]],
 ) -> None:
