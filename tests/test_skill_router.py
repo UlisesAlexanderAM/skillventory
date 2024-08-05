@@ -13,14 +13,14 @@ client = testclient.TestClient(app=main.app)
 BASE_ROUTE = "/v1/skills"
 
 
-@pytest.fixture()
+@pytest.fixture
 def one_json_skill(
     factory_skills_json: Callable[[int], Sequence[dict[str, str]]],
 ) -> dict[str, str]:
     return factory_skills_json(1)[0]
 
 
-@pytest.fixture()
+@pytest.fixture
 def _post_one_skill(one_json_skill: dict[str, str]) -> None:
     skill = one_json_skill
     client.post(f"{BASE_ROUTE}/", json=skill)
@@ -50,7 +50,7 @@ def test_post_skill(
 class TestGetSkills:
     default_limit = 15
 
-    @pytest.fixture()
+    @pytest.fixture
     def post_skills(
         self, factory_skills_json: Callable[[int], list[dict[str, str]]]
     ) -> Callable[[int], None]:
@@ -150,7 +150,7 @@ class TestGetSkillByName:
 
 @pytest.mark.usefixtures("_post_one_skill")
 class TestUpdateSkillName:
-    @pytest.fixture()
+    @pytest.fixture
     def skill_name_modified(self, one_json_skill: dict[str, str]) -> dict[str, str]:
         skill_modified = one_json_skill.copy()
         skill_modified["skill_name"] = "Clojure"
@@ -180,7 +180,7 @@ class TestUpdateSkillName:
 
 @pytest.mark.usefixtures("_post_one_skill")
 class TestUpdateSkillLevel:
-    @pytest.fixture()
+    @pytest.fixture
     def skill_level_modified(self, one_json_skill: dict[str, str]) -> dict[str, str]:
         skill_modified = one_json_skill.copy()
         skill_modified["level_of_confidence"] = models.LevelOfConfidence.LEVEL_2.value

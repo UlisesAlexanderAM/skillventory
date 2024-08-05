@@ -12,7 +12,7 @@ from skillventory.database import config
 from skillventory.models import models
 
 
-@pytest.fixture()
+@pytest.fixture
 def get_db_session() -> Iterator[sqlmodel.Session]:
     """Gets a database session fixture.
 
@@ -26,7 +26,7 @@ def get_db_session() -> Iterator[sqlmodel.Session]:
         yield session
 
 
-@pytest.fixture()
+@pytest.fixture
 def override_get_db_session() -> Any:
     """Override get_db_session dependecy.
 
@@ -105,7 +105,7 @@ def factory_skills_json() -> Callable[[int], list[dict[str, str]]]:
     return _skills_json
 
 
-@pytest.fixture()
+@pytest.fixture
 def factory_skills_in_db(
     get_db_session: sqlmodel.Session,
     factory_skills_models: Callable[[int], list[models.SkillBase]],
@@ -133,7 +133,7 @@ def factory_skills_in_db(
     return _skills_in_db
 
 
-@pytest.fixture()
+@pytest.fixture
 def reportlog(pytestconfig: Any):  # noqa: PT004
     logging_plugin = pytestconfig.pluginmanager.getplugin("logging-plugin")
     handler_id = logger.add(logging_plugin.report_handler, format="{message}")
@@ -141,7 +141,7 @@ def reportlog(pytestconfig: Any):  # noqa: PT004
     logger.remove(handler_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 def caplog(caplog: logging.LogCaptureFixture) -> Iterator[logging.LogCaptureFixture]:
     handler_id = logger.add(
         caplog.handler,
