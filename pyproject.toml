@@ -10,7 +10,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.109.1"
+fastapi = {extras = ["standard"], version = "^0.112.0"}
 pydantic-settings = "^2.0.2"
 pydantic = "^2.1.1"
 uvicorn = {extras = ["standard"], version = "^0.26.0"}
@@ -28,7 +28,7 @@ mypy = "^1.4.1"
 bandit = {extras = ["toml"], version = "^1.7.5"}
 commitizen = "^3.10.0"
 pre-commit = "^3.4.0"
-pytype = "^2024.1.5"
+pytype = "^2024.4.11"
 
 [tool.poetry.group.test]
 optional = true
