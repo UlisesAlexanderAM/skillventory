@@ -134,7 +134,7 @@ def factory_skills_in_db(
 
 
 @pytest.fixture
-def reportlog(pytestconfig: Any):  # noqa: PT004
+def reportlog(pytestconfig: Any):
     logging_plugin = pytestconfig.pluginmanager.getplugin("logging-plugin")
     handler_id = logger.add(logging_plugin.report_handler, format="{message}")
     yield
