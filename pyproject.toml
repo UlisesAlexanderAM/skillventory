@@ -113,7 +113,7 @@ extend-select = [
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"**/tests/*" = ["S101","PLR0913", "PLR0917", "PLR6301"]
+"**/tests/*" = ["S101","PLR0913", "PLR0917", "PLR6301","PT004"]
 "**/models.py" = ["RUF012"]
 
 [tool.pydantic-mypy]
