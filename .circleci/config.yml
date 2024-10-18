@@ -76,7 +76,7 @@ jobs:
       - run:
           name: ruff linting
           command: |
-            poetry run ruff --fix
+            poetry run ruff check --fix
       - run:
           name: ruff formatting
           command: |
