@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "skillventory"
-version = "0.3.0"
+version = "0.3.1"
 description = "REST API to manage a personal inventory"
 authors = [
     "Ulises Alexander Arguelles Monjaraz <ulises_alexander_am@proton.me>",

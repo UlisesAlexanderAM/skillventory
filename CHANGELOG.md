@@ -1,3 +1,9 @@
+## 0.3.1 (2024-10-18)
+
+### Fix
+
+- remove ruff rule and conflicting type annotation
+
 ## 0.3.0 (2024-03-14)
 
 ### Feat
