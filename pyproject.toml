@@ -10,9 +10,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = {extras = ["standard"], version = "^0.112.0"}
-pydantic-settings = "^2.0.2"
-pydantic = "^2.1.1"
+fastapi = {extras = ["standard"], version = "^0.115.2"}
+pydantic-settings = "^2.6.0"
+pydantic = "^2.9.2"
 uvicorn = {extras = ["standard"], version = "^0.26.0"}
 loguru = "^0.7.2"
 sqlmodel = "^0.0.14"
