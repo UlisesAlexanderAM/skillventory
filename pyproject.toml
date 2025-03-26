@@ -1,48 +1,48 @@
-[tool.poetry]
+[project]
 name = "skillventory"
 version = "0.3.1"
 description = "REST API to manage a personal inventory"
-authors = [
-    "Ulises Alexander Arguelles Monjaraz <ulises_alexander_am@proton.me>",
-]
-license = "MIT"
+authors = [{ name = "Ulises Alexander Arguelles Monjaraz", email = "ulises_alexander_am@proton.me" }]
+requires-python = "~=3.11"
 readme = "README.md"
+license = "MIT"
+dependencies = [
+    "fastapi[standard]>=0.115.2,<0.116",
+    "pydantic-settings>=2.6.0,<3",
+    "pydantic>=2.9.2,<3",
+    "uvicorn[standard]>=0.26.0,<0.27",
+    "loguru>=0.7.2,<0.8",
+    "sqlmodel>=0.0.14,<0.0.15",
+    "fastui>=0.5.2,<0.6",
+    "sqlalchemy-libsql>=0.1.0,<0.2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-fastapi = {extras = ["standard"], version = "^0.115.2"}
-pydantic-settings = "^2.6.0"
-pydantic = "^2.9.2"
-uvicorn = {extras = ["standard"], version = "^0.26.0"}
-loguru = "^0.7.2"
-sqlmodel = "^0.0.14"
-fastui = "^0.5.2"
-sqlalchemy-libsql = "^0.1.0"
+[dependency-groups]
+linting = [
+    "ruff>=0.1.13,<0.2",
+    "mypy>=1.4.1,<2",
+    "bandit[toml]>=1.7.5,<2",
+    "commitizen>=3.10.0,<4",
+    "pre-commit>=3.4.0,<4",
+    "pytype>=2024.4.11,<2025",
+]
+test = [
+    "pytest>=7.4.4,<8",
+    "pytest-cov>=4.1.0,<5",
+    "httpx>=0.26.0,<0.27",
+]
+docs = ["mkdocs-material>=9.5.4,<10"]
 
-[tool.poetry.group.linting]
-optional = true
+[tool.uv]
+default-groups = [
+    "linting",
+    "test",
+    "docs",
+]
 
-[tool.poetry.group.linting.dependencies]
-ruff = "^0.1.13"
-mypy = "^1.4.1"
-bandit = {extras = ["toml"], version = "^1.7.5"}
-commitizen = "^3.10.0"
-pre-commit = "^3.4.0"
-pytype = "^2024.4.11"
-
-[tool.poetry.group.test]
-optional = true
-
-[tool.poetry.group.test.dependencies]
-pytest = "^7.4.4"
-pytest-cov = "^4.1.0"
-httpx = "^0.26.0"
-
-[tool.poetry.group.docs]
-optional = true
-
-[tool.poetry.group.docs.dependencies]
-mkdocs-material = "^9.5.4"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
@@ -122,12 +122,11 @@ init_typed = true
 warn_required_dynamic_aliases = true
 warn_untyped_fields = true
 
-
 [tool.commitizen]
 name = "cz_conventional_commits"
 tag_format = "$version"
 version_scheme = "pep440"
-version_provider = "poetry"
+version_provider = "uv"
 update_changelog_on_bump = true
 major_version_zero = true
 
@@ -136,7 +135,3 @@ exclude_dirs=["tests"]
 
 [tool.pytype]
 inputs = ["skillventory"]
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
