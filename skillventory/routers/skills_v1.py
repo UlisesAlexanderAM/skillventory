@@ -1,7 +1,7 @@
 """Module that defines the routes related to skills/knowledge/competence."""
 
 from collections.abc import Sequence
-from typing import Annotated, Any, Dict, Optional
+from typing import Annotated, Any
 
 import fastapi as fa
 import sqlmodel
@@ -72,7 +72,7 @@ def post_skill(
             },
         ),
     ],
-) -> Dict[str, str]:
+) -> dict[str, str]:
     if not crud.get_skill_by_name(session=session, skill_name=skill.skill_name):
         crud.create_skill(session=session, skill=skill)
         return {"message": "Skill added successfully"}
@@ -88,7 +88,7 @@ def get_skill_by_id(
     session: Annotated[sqlmodel.Session, fa.Depends(deps.get_db_session)],
     skill_id: Annotated[int, fa.Path(title="The ID of the skill to get")],
 ) -> models.Skill:
-    skill_db: Optional[models.Skill] = crud.get_skill_by_id(
+    skill_db: models.Skill | None = crud.get_skill_by_id(
         session=session, skill_id=skill_id
     )
     if skill_db is None:
@@ -105,8 +105,8 @@ def get_skill_by_id(
 def get_skill_by_name(
     session: Annotated[sqlmodel.Session, fa.Depends(deps.get_db_session)],
     skill_name: Annotated[str, fa.Path(title="The name of the skill to get")],
-) -> Optional[models.Skill]:
-    skill_db: Optional[models.Skill] = crud.get_skill_by_name(
+) -> models.Skill | None:
+    skill_db: models.Skill | None = crud.get_skill_by_name(
         session=session, skill_name=skill_name
     )
     if skill_db is None:

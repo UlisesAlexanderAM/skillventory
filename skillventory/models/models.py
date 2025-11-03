@@ -17,7 +17,6 @@ and for serialization/deserialization with Pydantic.
 """
 
 import enum
-from typing import Optional
 import sqlmodel
 
 
@@ -56,6 +55,6 @@ class SkillBase(sqlmodel.SQLModel):
 
 
 class Skill(sqlmodel.SQLModel, table=True):
-    skill_id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    skill_id: int | None = sqlmodel.Field(default=None, primary_key=True)
     skill_name: str = sqlmodel.Field(unique=True, index=True)
     level_of_confidence: LevelOfConfidence = sqlmodel.Field(index=True)

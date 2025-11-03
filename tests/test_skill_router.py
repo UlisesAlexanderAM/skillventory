@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Callable
+from collections.abc import Callable
 
 import pytest
 from fastapi import status, testclient
