@@ -1,5 +1,5 @@
 from collections.abc import Callable, Sequence
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 import pytest
 import sqlmodel
@@ -25,7 +25,7 @@ def test_create_skill(
     skill_model: models.SkillBase = factory_skills_models(1)[0]
 
     crud.create_skill(session=get_db_session, skill=skill_model)
-    skill: Optional[models.Skill] = crud.get_skill_by_name(
+    skill: models.Skill | None = crud.get_skill_by_name(
         session=get_db_session, skill_name=skill_model.skill_name
     )
 
@@ -45,7 +45,7 @@ def test_delete_skill(
     skill_id: int,
 ) -> None:
     factory_skills_in_db(1)
-    skill: Optional[models.Skill] = crud.get_skill_by_id(
+    skill: models.Skill | None = crud.get_skill_by_id(
         session=get_db_session, skill_id=skill_id
     )
 
@@ -64,7 +64,7 @@ class TestGetOneSkill:
         expected_warning: bool,
         caplog: Any,
     ) -> None:
-        skill: Optional[models.Skill] = crud.get_skill_by_id(
+        skill: models.Skill | None = crud.get_skill_by_id(
             session=get_db_session, skill_id=skill_id
         )
 
@@ -116,7 +116,7 @@ class TestUpdateSkill:
                 skill_name=new_skill_name,
                 skill_level=skill.level_of_confidence,
             )
-            skill_updated: Optional[models.Skill] = crud.get_skill_by_id(
+            skill_updated: models.Skill | None = crud.get_skill_by_id(
                 session=get_db_session, skill_id=skill_id
             )
 
@@ -140,7 +140,7 @@ class TestUpdateSkill:
             skill=skill,
             new_level=new_level_of_confidence,
         )
-        skill_updated: Optional[models.Skill] = crud.get_skill_by_id(
+        skill_updated: models.Skill | None = crud.get_skill_by_id(
             session=get_db_session, skill_id=skill_id
         )
 
